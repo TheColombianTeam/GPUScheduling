@@ -1,0 +1,3 @@
+[submodule "PyOpenTCU"]
+	path = PyOpenTCU
+	url = https://github.com/TheColombianTeam/PyOpenTCU.git
