@@ -1,22 +1,18 @@
-name: posit16 # name of the experiment needed for the logs
+name: logs # name of the experiment needed for the logs
 
 faults:
   dir: ./faults # path needed for the fault campaing
 
 config:
-  format: posit16
+  format: float16
 
-tensor:
-  arch: 'volta'
-  num_tcu: 2
-  threads_per_warp: 32
-  num_buffers: 4
-  num_thread_groups: 8
-  tcu:
-    dpu: 16
+gpu:
+  sm: 4
+  cluster: 2
 
-#scheduler: 'DistributedBlock'
-#scheduler: 'DistributedCTA'
 scheduler: 'GlobalRoundRobin'
-#scheduler: 'Greedy'
-#scheduler: 'TwoLevelRoundRobin'
+
+mxm:
+  MS: 16 # for now, this value is constant
+  NS: 16 # for now, this value is constant
+  KS: 16 # for now, this value is constant

@@ -22,7 +22,7 @@ if "config" in cli_args and cli_args.config:
 args = OmegaConf.merge(args, cli_args)
 
 # add log directories
-args.log_dir = os.path.join(args.name)
+args.log_dir = os.path.join(os.path.dirname(__file__), "..", args.name)
 args.logfile = os.path.join(
     args.log_dir, datetime.now().strftime("%b%d_%H-%M-%S") + ".log"
 )
