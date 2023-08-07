@@ -10,7 +10,7 @@ gpu:
   sm: 4
   cluster: 2
 
-scheduler: 'GlobalRoundRobin'
+scheduler: 'Mock'
 
 mxm:
   MS: 16 # for now, this value is constant
