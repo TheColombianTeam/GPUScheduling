@@ -17,18 +17,19 @@ class Mock(Scheduler.Scheduler):
         self.__scheduler_info = []
 
     def scheduler_algorithm(self, a, b, c):
+
         self.__tiling(a, b, c)
         # TODO: Include scheduler policy
         return self.__scheduler_info
 
-    def __complete(self, matrix):
+    def __complete(self, matrix,x_tiling,y_tiling):
         shape = matrix.shape
-        if (shape[0] % MS) > 0:
-            new_shape_a = MS * (shape[0] // MS) + MS
+        if (shape[0] % x_tiling) > 0:
+            new_shape_a = x_tiling * (shape[0] // x_tiling) + x_tiling
         else:
             new_shape_a = shape[0]
-        if (shape[1] % NS) > 0:
-            new_shape_b = NS * (shape[1] // NS) + NS
+        if (shape[1] % y_tiling) > 0:
+            new_shape_b = y_tiling * (shape[1] // y_tiling) + y_tiling
         else:
             new_shape_b = shape[1]
         new_shape = new_shape_a, new_shape_b
@@ -41,9 +42,9 @@ class Mock(Scheduler.Scheduler):
         CTA_id = 0
         SM_id = 0
         cluster_id = 0
-        a = self.__complete(a)
-        b = self.__complete(b)
-        c = self.__complete(c)
+        a = self.__complete(a,MS,KS)
+        b = self.__complete(b,KS,NS)
+        c = self.__complete(c,MS,NS)
         c_shape = c.shape
         for row_c in range(c_shape[0] // MS):
             new_row_c_start = MS * row_c

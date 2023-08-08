@@ -9,8 +9,9 @@ config:
 gpu:
   sm: 4
   cluster: 2
+  CTAs_buffer: 2
 
-scheduler: 'Mock'
+scheduler: 'TwoLevelRoundRobin'
 
 mxm:
   MS: 16 # for now, this value is constant

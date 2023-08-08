@@ -16,7 +16,6 @@ MS = args.mxm.MS
 NS = args.mxm.NS
 KS = args.mxm.KS
 
-
 def complete(matrix):
     shape = matrix.shape
     if (shape[0] % MS) > 0:
@@ -31,7 +30,6 @@ def complete(matrix):
     new_matrix = np.zeros(new_shape)
     new_matrix[: shape[0], : shape[1]] = matrix
     return new_matrix
-
 
 def read_matrix(filename):
     path = os.getcwd()
@@ -120,7 +118,7 @@ def gpu_kernel_execution(a, b, c, CTAs, tensor):
 def tiling(a, b, c):
     a = complete(a)
     b = complete(b)
-    c = complete(c)
+    c = complete(c) 
     tensor = Tensor()
     scheduler = getattr(schedulers_list, args.scheduler)()
     CTAs = scheduler.scheduler_algorithm(a, b, c)
