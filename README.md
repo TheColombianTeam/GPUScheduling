@@ -78,7 +78,7 @@ def main():
 ```
 You can generate the new matrices once you modify the golden file by executing the following command. NOTE: If you increase the matrix size, this golden generation will take from some minutes to several hours since the whole multiplication will run on the tensor unit. 
 
-```
+```bash
 python golden.py
 ```
 After the golden is generated successfully, then you can run the bash script to check if the array of CTAs generated in your scheduler policy is still working correctly. 
