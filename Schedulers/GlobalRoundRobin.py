@@ -1,7 +1,6 @@
 from .models import Scheduler
 import numpy as np
 from utils.args import args
-from log.logger import logger
 import os
 import csv
 

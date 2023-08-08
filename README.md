@@ -56,6 +56,6 @@ To validate the scheduler policy implemented, please modify the `SCHEDULER_POLIC
 
 ### **ODIFICATIONS MY LAST PUSH
 i) Modified zero padding (__complete method) inside scheduler classes instead as a stand alone method and modified it in order to also substain rectangular tiling 
-ii) Implemented and testedschedulers algorithms : 2LRR, GRR
+ii) Implemented and testedschedulers algorithms : 2LRR, GRR, Greedy
 iii )Increased dimentions of golden values in order observe psuedo-dynamic scheduling
  
