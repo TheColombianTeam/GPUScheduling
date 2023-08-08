@@ -12,13 +12,7 @@ git clone --recurse-submodules https://github.com/TheColombianTeam/Schedulers.gi
 
 This framework is built on top of [PyOpenTCU](https://github.com/TheColombianTeam/PyOpenTCU.git). The requirements are available inside [requeriments.txt](./requeriments.txt).
 
-If you are using Anaconda or Miniconda as the environment manager, please install the requirements as any of the following commands:
-
-```bash
-conda env create -f environment.yml
-```
-
-Otherwise, use the following command:
+Please install using following command:
 
 ```bash
 pip install -r requeriments.txt
