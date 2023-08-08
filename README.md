@@ -50,7 +50,35 @@ SCHEDULER_POLICY=TwoLevelRoundRobin
 
 ### Development process
 
-Inside the [Schedulers](/Schedulers/) module, you can find the different policies to be implemented. The [Mock](/Schedulers/mock.py) class contains the basic idea of: i) tiling and ii) a list of dictionaries with the scheduled tiles to be returned. Inside the *Mock* class, you will find the method [scheduler_algorithm](/Schedulers/mock.py?plain=1#L19). This method is the one that should implement the tiling procedure and the scheduling implementation, and it should return the list of dictionaries as the requirement for the fault injector. This method is also the interface between the scheduler and the rest of the framework, so you should use a similar implementation of such a function for every scheduler you need to implement. This method receives as parameters the matrices `A`, `B`, and `C` and should return an array with the CTAs structure shown in [Scheduler](/Schedulers/models/Scheduler.py?plain=1#L20). All the policies implemented must return this structure since it is used by the Fault Injector (now under development).
+Inside the [Schedulers](/Schedulers/) module, you can find the different policies to be implemented. The [Mock](/Schedulers/mock.py) class contains the basic idea of: 
+- Basic Tiling (generates CTAs Id and (X, Y) coordinates, other parameters are dummy)
+- return a list of dictionaries with the scheduled tiles (No scheduler implemented) 
 
-To validate the scheduler policy implemented, please modify the `SCHEDULER_POLICY` variable on `run.sh` according to the information above. After the execution, you can find in the ./logs directory a log file that will show if the verification passed or, on the contrary, it failed. NOTE: the verification only checks that the matrix multiplication can be done by using the array structure your scheduler implementation provided; however, the correct scheduling assignment must be checked on your own. 
+Inside the *Mock* class, you will find the method [scheduler_algorithm](/Schedulers/mock.py?plain=1#L19). This method is the one that should implement the tiling procedure and the scheduling implementation, and it should return the list of dictionaries as the requirement for the fault injector. This method is also the interface between the scheduler and the rest of the framework, so you should use a similar implementation of such a function for every scheduler you need to implement. This method receives as parameters the matrices `A`, `B`, and `C` and should return an array with the CTAs structure shown in [Scheduler](/Schedulers/models/Scheduler.py?plain=1#L20). All the policies implemented must return this structure since it is used by the Fault Injector (now under development).
 
+To validate the scheduler policy implemented, please modify the `SCHEDULER_POLICY` variable on `run.sh` according to the information above. After the execution, you can find in the ./logs directory a log file that will show if the verification passed or, on the contrary, it failed. 
+
+NOTE: the verification only checks that the matrix multiplication can be done by using the array structure your scheduler implementation provided; however, the correct scheduling assignment must be checked on your own. 
+
+### Change Matrix Size
+If you want to evaluate different matrix sizes, you can modify the arguments of the matrix generation in the [golden.py](https://github.com/TheColombianTeam/Schedulers/blob/c50d9a0069a373c0de62c5f91d4092b75af9afcb/golden.py#L43C12-L43C12). For example, the following snippet code for the main function creates the golden matrices a,b,c,d of size 128X128, you can use any size you want being careful that the sizes are correct for performing matrix multiplication.
+
+```python
+def main():
+    a = create_matrix(size=[128,128])
+    b = create_matrix(size=[128,128])
+    c = create_matrix(size=[128,128])
+    d_ = tiling(a, b, c)
+    d = np.matmul(a, b) + c
+    validate(d, d_)
+    save_matrix(a, "a")
+    save_matrix(b, "b")
+    save_matrix(c, "c")
+    save_matrix(d_, "d")
+```
+You can generate the new matrices once you modify the golden file by executing the following command. NOTE: If you increase the matrix size, this golden generation will take from some minutes to several hours since the whole multiplication will run on the tensor unit. 
+
+```
+python golden.py
+```
+After the golden is generated successfully, then you can run the bash script to check if the array of CTAs generated in your scheduler policy is still working correctly. 
