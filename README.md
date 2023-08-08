@@ -1,6 +1,6 @@
 # Schedulers
 
-This framework is a functional simulator of different scheduler policies for Matrix Multiplication. The scheduler policies implemented the tiling approach presented in [Tiling algorithm GEMM](http://arxiv.org/abs/1808.07984), and it describes the functional implementation of different scheduling policies presented by [Scheduling for NoC arhcitectures](https://ieeexplore.ieee.org/abstract/document/8625517)
+This framework is a functional simulator of different scheduler policies for Matrix Multiplication. The scheduler policies implemented the tiling approach presented in [Tiling algorithm GEMM](http://arxiv.org/abs/1808.07984) and [NVIDIA Tiling](https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html), and it describes the functional implementation of different scheduling policies presented by [Scheduling for NoC arhcitectures](https://ieeexplore.ieee.org/abstract/document/8625517)
 
 ## Intallation
 
