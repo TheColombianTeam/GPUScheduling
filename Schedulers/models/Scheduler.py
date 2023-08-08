@@ -3,6 +3,8 @@ from typing import List
 import random
 
 
+
+
 class Scheduler(ABC):
     def __init__(self):
         super().__init__()
@@ -34,8 +36,8 @@ class Scheduler(ABC):
         pass
     import random
 
-    def random_delay_generator_simulator(input_list, l):
-    
+    def random_delay_generator_simulator(self, l):
+        input_list = []
         output_list = []
         for i in range(l):
             input_list.append(i)
@@ -48,4 +50,4 @@ class Scheduler(ABC):
             else:
                 output_list.append(input_list[0])
     
-        return output_list[:]
+        return output_list

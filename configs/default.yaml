@@ -11,7 +11,8 @@ gpu:
   cluster: 2
   CTAs_buffer: 2
 
-scheduler: 'TwoLevelRoundRobin'
+scheduler: 'GlobalRoundRobin'
+
 
 mxm:
   MS: 16 # for now, this value is constant

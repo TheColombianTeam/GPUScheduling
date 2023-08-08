@@ -46,7 +46,7 @@ class TwoLevelRoundRobin(Scheduler.Scheduler):
                     cluster_id = 0
                     dynamic_scheduled_row += 1
                     stocastic_ordering = []
-                    stocastic_ordering= self.random_delay_generator_simulator(stocastic_ordering,self._n_clusters)
+                    stocastic_ordering= self.random_delay_generator_simulator(self._n_clusters)
                     to_schedule_CTAs_per_cluster[stocastic_ordering[cluster_id]].append(CTA_id)
                     self.__scheduler_info[CTA_id]["Cluster"] = stocastic_ordering[cluster_id]
                     cluster_id += 1
@@ -75,7 +75,7 @@ class TwoLevelRoundRobin(Scheduler.Scheduler):
                         dynamic_row_scheduled += 1
                         SM_id = 0
                         stocastic_ordering = []
-                        stocastic_ordering = self.random_delay_generator_simulator(stocastic_ordering,self._n_SM_per_cluster)
+                        stocastic_ordering = self.random_delay_generator_simulator(self._n_SM_per_cluster)
                         self.__scheduler_info[to_schedule_CTAs_per_cluster[c][CTA]]["SM"] = stocastic_ordering[SM_id]
                         SM_id += 1
                 

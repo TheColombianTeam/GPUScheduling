@@ -7,7 +7,7 @@ import numpy as np
 import os
 
 
-def create_matrix(size=[63, 63], scale=20, offset=10):
+def create_matrix(size=[120, 120], scale=20, offset=10):
     return (np.random.rand(size[0], size[1]) * scale) - offset
 
 
@@ -41,12 +41,17 @@ def validate(d_golden, d):
 
 
 def main():
-    a = read_matrix("a")
-    b = read_matrix("b")
-    c = read_matrix("c")
+    a = create_matrix()
+    b = create_matrix()
+    c = create_matrix()
     d_ = tiling(a, b, c)
     d = np.matmul(a, b) + c
     validate(d, d_)
+    save_matrix(a,"a.npy")
+    save_matrix(b,"b.npy")
+    save_matrix(c,"c.npy")
+    save_matrix(d_,"d.npy")
+
 
 
 if __name__ == "__main__":
