@@ -68,9 +68,12 @@ iii )Increased dimentions of golden values in order observe psuedo-dynamic sched
 i) Implment fault injector --> starting form CSV and imposed faulty SM, implement fault injector by modifing gpu_kernel and scheduler_sm as follows
 
 - read output tensor d
-- according to fault_SM id, read csv and determine CTAs that are executed by faulty SM
+- according to fault_SM id, read csv and determine CTAs that are executed to faulty SM
 - modify regions of output tensor: 
+
     *if CTA  is executed by faulty_SM -> overwrite that block of golden output tensor d with initial value of accumulator c in that CTA
+    
     *call scheduler_sm function passing as input the ablock bblock and cblock generating that "faultyCTA" and faulty tensor object.
+
 - fault propagation: read d tensor again and store it in a different numpy array and test it aginst faulty d tensor to store faulty entrances
 
