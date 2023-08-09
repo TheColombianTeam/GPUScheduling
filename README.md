@@ -54,8 +54,23 @@ Inside the [Schedulers](/Schedulers/) module, you could find the different polic
 
 To validate the scheduler policy implemented, please modify the `SCHEDULER_POLICY` variable on `run.sh` according to the information above.
 
-### **ODIFICATIONS MY LAST PUSH
+### **MODIFICATIONS MY LAST PUSH
+
 i) Modified zero padding (__complete method) inside scheduler classes instead as a stand alone method and modified it in order to also substain rectangular tiling 
-ii) Implemented and testedschedulers algorithms : 2LRR, GRR, Greedy
+
+ii) Implemented and testedschedulers algorithms : 2LRR, GRR, Greedy, Distributed-CTA,Distributed-Block
+
+
 iii )Increased dimentions of golden values in order observe psuedo-dynamic scheduling
  
+### **Future modifications
+
+i) Implment fault injector --> starting form CSV and imposed faulty SM, implement fault injector by modifing gpu_kernel and scheduler_sm as follows
+
+- read output tensor d
+- according to fault_SM id, read csv and determine CTAs that are executed by faulty SM
+- modify regions of output tensor: 
+    *if CTA  is executed by faulty_SM -> overwrite that block of golden output tensor d with initial value of accumulator c in that CTA
+    *call scheduler_sm function passing as input the ablock bblock and cblock generating that "faultyCTA" and faulty tensor object.
+- fault propagation: read d tensor again and store it in a different numpy array and test it aginst faulty d tensor to store faulty entrances
+

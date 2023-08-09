@@ -135,7 +135,7 @@ class TwoLevelRoundRobin(Scheduler.Scheduler):
         self.__scheduler_info.append(CTA_info)
 
     def printing_csv(self):
-        
+        os.chdir("SCHEDULED_CTA")
         file_path = os.path.join(os.getcwd(), "2LRR_schedler.csv")
         file_ptr = open(file_path, "w")
         writer = csv.writer(file_ptr)
@@ -151,3 +151,4 @@ class TwoLevelRoundRobin(Scheduler.Scheduler):
             writer.writerow(row)
 
         file_ptr.close()
+        os.chdir("../")

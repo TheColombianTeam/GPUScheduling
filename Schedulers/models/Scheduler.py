@@ -34,7 +34,7 @@ class Scheduler(ABC):
             ]
         """
         pass
-    import random
+    
 
     def random_delay_generator_simulator(self, l):
         input_list = []

@@ -35,7 +35,6 @@ class Greedy(Scheduler.Scheduler):
             to_schedule_CTAs_per_cluster.append([])
 
         #CLUSTER SCHEDULING
-        print(self.n_CTA_in_cluster)
         for CTA_id in range(len(self.__scheduler_info)):
             if(CTA_id < self.CTAs_to_schedule_statically_in_clusters):
                 if(CTA_id < (cluster_id +1)*self.n_CTA_in_cluster):
@@ -142,7 +141,7 @@ class Greedy(Scheduler.Scheduler):
         self.__scheduler_info.append(CTA_info)
 
     def printing_csv(self):
-        
+        os.chdir("SCHEDULED_CTA")
         file_path = os.path.join(os.getcwd(), "Greedy_scheduler.csv")
         file_ptr = open(file_path, "w")
         writer = csv.writer(file_ptr)
@@ -158,5 +157,6 @@ class Greedy(Scheduler.Scheduler):
             writer.writerow(row)
 
         file_ptr.close()
+        os.chdir("../")
 
 
