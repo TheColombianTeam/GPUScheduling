@@ -1,1 +1,0 @@
-{'name': 'logs', 'faults': {'dir': './faults'}, 'config': {'format': 'float16'}, 'gpu': {'sm': 4, 'cluster': 2, 'CTAs_buffer': 2}, 'scheduler': 'TwoLevelRoundRobin', 'mxm': {'MS': 16, 'NS': 16, 'KS': 16}, 'log_dir': '/home/francesco/Desktop/TESI/Schedulers/utils/../logs', 'logfile': '/home/francesco/Desktop/TESI/Schedulers/utils/../logs/Aug08_12-13-59.log'}
