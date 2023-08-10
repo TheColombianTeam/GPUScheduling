@@ -77,14 +77,19 @@ python golden.py
 ```
 After the golden is generated successfully, then you can run the bash script to check if the array of CTAs generated in your scheduler policy is still working correctly. 
 
+### Formatting code
+
+Only for maintaining a common structure, I recommend using one format extension (i.e., [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter)) for vs. Please use it.
+
 ### **MODIFICATIONS MY LAST PUSH
 
-i) Modified zero padding (__complete method) inside scheduler classes instead as a stand alone method and modified it in order to also substain rectangular tiling 
+i) Modified zero padding ([complete](/Schedulers/utils.py?plain=1#L5) method) inside scheduler classes instead as a stand alone method and modified it in order to also substain rectangular tiling 
 
 ii) Implemented and testedschedulers algorithms : 2LRR, GRR, Greedy, Distributed-CTA,Distributed-Block
 
+iii) Increased dimentions of golden values in order observe psuedo-dynamic scheduling
 
-iii )Increased dimentions of golden values in order observe psuedo-dynamic scheduling
+iv) Save the csv files in the [scheduled](/Schedulers/scheduled/) folder
  
 ### **Future modifications
 
