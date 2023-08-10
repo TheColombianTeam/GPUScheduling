@@ -13,7 +13,6 @@ gpu:
 
 scheduler: 'GlobalRoundRobin'
 
-
 mxm:
   MS: 16 # for now, this value is constant
   NS: 16 # for now, this value is constant
