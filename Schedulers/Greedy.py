@@ -133,8 +133,8 @@ class Greedy(Scheduler.Scheduler):
                     "SM": SM_id,
                     "CTA": {
                         "id": CTA_id,
-                        "x": new_column_c_start,
-                        "y": new_row_c_start,
+                        "x": new_row_c_start,
+                        "y": new_column_c_start,
                     },
                 }
                 CTA_id += 1
