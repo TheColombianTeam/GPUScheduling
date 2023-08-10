@@ -53,8 +53,6 @@ class DistributedBlock(Scheduler.Scheduler):
                 self.__scheduler_info[CTA_id]["Cluster"] = cluster_id
                 to_schedule_CTAs_per_cluster[cluster_id].append(CTA_id)
         
-
-
         #It goes without saying that this procedure is static per each CTA 
         # SM SCHEDULING
         for c in range(len(to_schedule_CTAs_per_cluster)):
@@ -89,32 +87,18 @@ class DistributedBlock(Scheduler.Scheduler):
                         SM_id = 0
                         dynamic_scheduled_block += 1
                 
-        self.printing_csv()
+        save_csv(self.__scheduler_info, "distributed_block")
         return self.__scheduler_info
 
-    def __complete(self, matrix,x_tiling,y_tiling):
-        shape = matrix.shape
-        if (shape[0] % x_tiling) > 0:
-            new_shape_a = x_tiling * (shape[0] // x_tiling) + x_tiling
-        else:
-            new_shape_a = shape[0]
-        if (shape[1] % y_tiling) > 0:
-            new_shape_b = y_tiling * (shape[1] // y_tiling) + y_tiling
-        else:
-            new_shape_b = shape[1]
-        new_shape = new_shape_a, new_shape_b
-        new_matrix = np.zeros(new_shape)
-        new_matrix[: shape[0], : shape[1]] = matrix
-        return new_matrix
 
     def __tiling(self, a, b, c):
         # Initial values
         CTA_id = 0
         SM_id = -1
         cluster_id = -1
-        a = self.__complete(a,MS,KS)
-        b = self.__complete(b,KS,NS)
-        c = self.__complete(c, MS, NS)
+        a = complete(a,MS,KS)
+        b = complete(b,KS,NS)
+        c = complete(c, MS, NS)
         c_shape = c.shape
         for row_c in range(c_shape[0] // MS):
             new_row_c_start = MS * row_c
@@ -138,22 +122,4 @@ class DistributedBlock(Scheduler.Scheduler):
     def __create_dict(self, CTA_info):
         self.__scheduler_info.append(CTA_info)
 
-    def printing_csv(self):
-        os.chdir("SCHEDULED_CTA")
-        file_path = os.path.join(os.getcwd(), "DistributedBlock_scheduler.csv")
-        file_ptr = open(file_path, "w")
-        writer = csv.writer(file_ptr)
-        Table_title = ["CTA_id","Cluster","SM","x","y"]
-        writer.writerow(Table_title)
-        for CTA in range(len(self.__scheduler_info)):
-            row = []
-            row.append(str(CTA))
-            row.append(str(self.__scheduler_info[CTA]["Cluster"]))
-            row.append(str(self.__scheduler_info[CTA]["SM"]))
-            row.append(str(self.__scheduler_info[CTA]["CTA"]["x"]))
-            row.append(str(self.__scheduler_info[CTA]["CTA"]["y"]))
-            writer.writerow(row)
-
-        file_ptr.close()
-        os.chdir("../")
 
