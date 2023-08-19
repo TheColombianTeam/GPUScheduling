@@ -62,7 +62,7 @@ def golden(A_x_dim, A_B_common_dim, B_y_dim, min_value = 0, max_value = 1):
     d_ = tiling(a, b, c)
     d = np.matmul(a, b) + c
 
-    validation = validate(d, d_, 0.5*float(max-min))#big error range for validation due to computation error float16/float32
+    validation = validate(d, d_, 0.5*float(max_value-min_value))#big error range for validation due to computation error float16/float32
     if( not(validation)):
         print("Validation Test Failed")
         sys.exit()
