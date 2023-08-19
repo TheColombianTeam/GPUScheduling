@@ -83,25 +83,8 @@ Only for maintaining a common structure, I recommend using one format extension 
 
 ### **MODIFICATIONS MY LAST PUSH
 
-i) Modified zero padding ([complete](/Schedulers/utils.py?plain=1#L5) method) inside scheduler classes instead as a stand alone method and modified it in order to also substain rectangular tiling 
+- Implemented golden module: uses function in Kernel repo to calculate the golden value matrix mul and compare against matrix multiplication performed with np.matmul.  Furthermore, it calls the schedulers to allocate CTAs to SMs and validates scheduler behaviour --> scheduler results stored in .json as suggested
 
-ii) Implemented and testedschedulers algorithms : 2LRR, GRR, Greedy, Distributed-CTA,Distributed-Block
-
-iii) Increased dimentions of golden values in order observe psuedo-dynamic scheduling
-
-iv) Save the csv files in the [scheduled](/Schedulers/scheduled/) folder
+- fault list: randomly generate (using the numeric sequence suggested by SFI paper) 8k faults. If in the numeric sequence there are more than 380 similar faults the sequence is generated again otherwise the faults that are occuring more then once are replace deterministically in order to make sure to inject different faults. The same faults are injected on different schedulers to observe how the same failure generates errors at output tensor --> time of execution of this module depends on the required time to generate randly a numeric seed that will produce sequence of fault IDs to inject with less than 380 repetitions
  
 ### **Future modifications
-
-i) Implment fault injector --> starting form CSV and imposed faulty SM, implement fault injector by modifing gpu_kernel and scheduler_sm as follows
-
-- read output tensor d
-- according to fault_SM id, read csv and determine CTAs that are executed to faulty SM
-- modify regions of output tensor: 
-
-    *if CTA  is executed by faulty_SM -> overwrite that block of golden output tensor d with initial value of accumulator c in that CTA
-    
-    *call scheduler_sm function passing as input the ablock bblock and cblock generating that "faultyCTA" and faulty tensor object.
-
-- fault propagation: read d tensor again and store it in a different numpy array and test it aginst faulty d tensor to store faulty entrances
-

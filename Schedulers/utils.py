@@ -40,4 +40,5 @@ def save_json(scheduler_info, filename):
         for CTA in range(len(scheduler_info)):
             json.dump(scheduler_info[CTA],JSONfile)
             JSONfile.write('\n')
+    JSONfile.close()
     

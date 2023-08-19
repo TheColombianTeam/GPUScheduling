@@ -2,6 +2,8 @@ name: logs # name of the experiment needed for the logs
 
 faults:
   dir: ./faults # path needed for the fault campaing
+  exaustive_test: 86015
+  faults_to_inject : 8629 #this statistic fault injection will produce results with 1% error margin and 95% confidentiality
 
 config:
   format: float16
@@ -10,6 +12,9 @@ gpu:
   sm: 4
   cluster: 2
   CTAs_buffer: 2
+
+  faulty_cluster: 0
+  faulty_SM : 0
 
 scheduler: 'GlobalRoundRobin'
 
