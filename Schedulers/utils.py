@@ -1,5 +1,5 @@
 import numpy as np
-import os, csv
+import os, csv, json
 
 
 def complete(matrix, x_tiling, y_tiling):
@@ -33,3 +33,11 @@ def save_csv(scheduler_info, filename):
         row.append(str(scheduler_info[CTA]["CTA"]["y"]))
         writer.writerow(row)
     file_ptr.close()
+
+def save_json(scheduler_info, filename):
+    file_path = os.path.join(os.getcwd(), "Schedulers", "scheduled", f"{filename}.json")
+    with open(file_path, "w+") as JSONfile:
+        for CTA in range(len(scheduler_info)):
+            json.dump(scheduler_info[CTA],JSONfile)
+            JSONfile.write('\n')
+    

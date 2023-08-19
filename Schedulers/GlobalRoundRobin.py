@@ -2,7 +2,7 @@ from utils.args import args
 
 
 from .models import Scheduler
-from .utils import complete, save_csv
+from .utils import complete, save_csv,save_json
 
 
 MS = args.mxm.MS
@@ -13,6 +13,7 @@ KS = args.mxm.KS
 class GlobalRoundRobin(Scheduler.Scheduler):
     def __init__(self):
         super().__init__()
+        self._name = "GlobalRoundRobin"
         self.__scheduler_info = []
         self._n_clusters = args.gpu.cluster
         self._n_SM_per_cluster = args.gpu.sm
@@ -115,6 +116,7 @@ class GlobalRoundRobin(Scheduler.Scheduler):
                         dynamic_scheduled_row += 1
 
         save_csv(self.__scheduler_info, "global_round_robin")
+        save_json(self.__scheduler_info, "global_round_robin")
         return self.__scheduler_info
 
     def __tiling(self, a, b, c):
@@ -144,3 +146,6 @@ class GlobalRoundRobin(Scheduler.Scheduler):
 
     def __create_dict(self, CTA_info):
         self.__scheduler_info.append(CTA_info)
+    
+    def read_name(self):
+        return self._name
