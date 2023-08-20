@@ -13,8 +13,7 @@ bias = 380
 
 exaustive_test_n_faults = args.faults.exaustive_test
 n_fault_to_inject = args.faults.faults_to_inject
-faulty_cluster = args.gpu.faulty_cluster
-faulty_SM = args.gpu.faulty_SM
+
 
 def SFI(seed):
     SFI = []
@@ -55,7 +54,7 @@ def compensation(list, n_fault_to_compensate):
         list.append(f)
     return list[:]
 
-def save_fault_list(file_ptr,FIDs):
+def save_fault_list(file_ptr,FIDs, faulty_SM, faulty_cluster):
     writer = csv.writer(file_ptr)
     Table_title = ["Scheduler Policy", "Cluster target",'SM target','Fault ID']
     writer.writerow(Table_title)
@@ -77,7 +76,7 @@ def save_fault_list(file_ptr,FIDs):
     
     file_ptr.close()
 
-def fault_list():
+def fault_list(faulty_SM = 0, faulty_cluster = 0):
     #I'm randomly generating the FIDs but will inject same faults for each scheduling policy
     # Therefore is going to be possible to observe the effect of the same fault across different Schedulers
     failed_validation = True
@@ -89,7 +88,7 @@ def fault_list():
     FIDs = compensation(FIDs,n_fault_to_compensate)
     fault_list_file_path = os.path.join(os.getcwd(), "FaultInjector", "fault_list.csv")
     file_ptr = open(fault_list_file_path, "w+")
-    save_fault_list(file_ptr, FIDs)
+    save_fault_list(file_ptr, FIDs, faulty_SM, faulty_cluster)
 
     print("Fault list module completed") 
     
