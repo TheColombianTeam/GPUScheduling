@@ -108,4 +108,6 @@ def injector(number_of_workers):
 ```
 
 number_of_workers = number of parallel process that are working symultaneously -->user might decide its more siutable value thorugh some injections and according to fastest exe sets this parameter
+
+-validator: this module needs output tensor dimentions as input in order to generate a heat map with same dimentions, some heat maps have been generated using data from 10 fault injections in order to check code validity, please deleate HeatMap repo before starting a serius fault injection
 ### **Future modifications
