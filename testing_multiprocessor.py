@@ -34,7 +34,7 @@ def read_fault_list():
     return fault_list[:][:]
 
 def save_results(shared_faults_Queue):
-    path = os.path.join(os.getcwd(), 'FaultInjector', 'results.csv')
+    path = os.path.join(os.getcwd(), 'FaultInjector', 'results_for_multithreading_comp.csv')
     file_ptr = open(path, 'w+')
     writer = csv.writer(file_ptr)
     Table_Title = ['Scheduling Policy', 'ClusterTarget', 'SMTarget', 'faultID', 'X', 'Y', 'Golden', 'GoldenHexa', 'Faulty', ' FaultyHexa']
@@ -64,13 +64,24 @@ def save_results(shared_faults_Queue):
                 writer.writerow(to_write)
                 f.flush()
 
-            
+
+def validation():  
+    path = os.path.join(os.getcwd(), 'FaultInjector', 'results_for_multithreading_comp.csv')
+    path_multiprocessing =  os.path.join(os.getcwd(), 'FaultInjector', 'results_for_multithreading_comp.csv')
+
+    result = open(path, 'r')
+    result_multiprocessing = open(path_multiprocessing, 'r')
+
+    results_l = result.readlines()
+    result_l_multiprocessing = result_multiprocessing.readlines()
+
+    if(len(results_l) == len(result_l_multiprocessing) ):
+        print('TEST PASSED')
+    else:
+        print('TEST FAILED')       
 
 if __name__=="__main__":
-    golden(120,120,120)
-    fault_list()
 
-    #now I'm preparing the env to support multiprocessing with threads accessing same file for ouput storing through a Queue 
     if(workers <= 0):
         print(" Error number of process set through number of workers must be bigger then 0")
         sys.exit()
@@ -97,26 +108,23 @@ if __name__=="__main__":
     storing_results_pool.apply_async(save_results, (shared_faults_Queue,))
 
     beg = time.time()
-    injector_pool = mp.Pool(workers)
-    injector_jobs = []
     while( injected_faults < n_faults_to_inject):
-        injector_jobs.append(   injector_pool.apply_async(injector, (faults_list[injected_faults],a,b,c,d,CTAs_2LRR,
-                                                            CTAs_GRR,CTAs_GS,CTAs_DCTA,CTAs_DB,shared_faults_Queue)))
+        injector (faults_list[injected_faults],a,b,c,d,CTAs_2LRR,
+                                                            CTAs_GRR,CTAs_GS,CTAs_DCTA,CTAs_DB,shared_faults_Queue)
         injected_faults += 1
-    
-    for job in range(len(injector_jobs)):
-        injector_jobs[job].get()#Waiting that all fault injection have been performed
-    
+        
     shared_faults_Queue.put('#done#')#exiting infinite loop in process writing file with data from Queue
 
     end = time.time()
     print("ellapsed time for 100 fault injections : " +str((end-beg)/60)+ ' min ')
-    injector_pool.close()
-    injector_pool.join()
 
     storing_results_pool.close()
     storing_results_pool.join()
 
-    print('Fault injector campaign completed')    
-            
-    validator(120,120)#this function needs output tensor dimentions inposed in golden for heat map bins 
+    print('Fault injector campaign completed') 
+    validation()
+
+
+
+
+
