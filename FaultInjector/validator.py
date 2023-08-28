@@ -1,16 +1,86 @@
-import os
-import csv
+import os,sys
+import csv,json
+
 import seaborn as sbr
+from sfpy import *
 
 import matplotlib.pyplot as plt
 from matplotlib import  cm
 
 import numpy as np
 from utils.args import args
+from log.logger import logger
 
 MS = args.mxm.MS
 NS = args.mxm.NS
+format_type = str(args.config.format)
 
+
+def write_Json(Models,path):
+    path = os.path.join(os.getcwd(), 'FaultInjector', 'ErrorModel', 'FaultsErrorModel.json')
+    with open(path, "w+") as JSONfile:
+            json.dump(Models,JSONfile)        
+    JSONfile.close()
+
+def write_csv(Models,path):
+    file_ptr = open(path, "w+")
+    writer = csv.writer(file_ptr)
+    Table_Title = ['FaultID','Scheduling Policy', 'MeanRelativeError(%)','AverageAbsoluteError','Discrepancy Average activations', 'Discrepancy Standard Deviation activations',
+                   'Bit 0 Flip Probability', 'Bit 1 Flip Probability','Bit 2 Flip Probability','Bit 3 Flip Probability','Bit 4 Flip Probability','Bit 5 Flip Probability',
+                   'Bit 6 Flip Probability','Bit 7 Flip Probability','Bit 8 Flip Probability','Bit 9 Flip Probability','Bit 10 Flip Probability','Bit 11 Flip Probability',
+                   'Bit 12 Flip Probability','Bit 13 Flip Probability','Bit 14 Flip Probability','Bit 15 Flip Probability','Entrance', 'Probability of entrance curroption(%)','Mask', 'Ripetition...']
+
+    writer.writerow(Table_Title)
+    for fault in range(len(Models)):
+        row = []
+        row.append(Models[fault]['FaultID'])
+        row.append(Models[fault]['Scheduler'])
+        row.append(Models[fault]['MeanRelativeError(%)'])
+        row.append(Models[fault]['AverageAbsoluteError'])
+        row.append(Models[fault]['Discrepancy_Avg_against_golden_avg'])
+        row.append(Models[fault]['Discrepancy_Std_against_golden_std'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit0)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit1)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit2)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit3)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit4)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit5)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit6)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit7)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit8)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit9)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit10)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit11)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit12)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit13)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit14)'])
+        row.append(Models[fault]['BitFlipProbabilities']['P(bit15)'])
+        
+        
+        
+        for entrance in Models[fault]['FaultyEntrancesCTA']:
+            row.append(entrance)
+            P,mask = Models[fault]['FaultyEntrancesCTA'][entrance]
+            row.append(P)
+            row.append(mask)
+        writer.writerow(row)
+
+    file_ptr.close()
+
+def read_matrix(filename):
+    path = os.getcwd()
+    golden_path = os.path.join(path, "golden", filename + ".npy")
+    return np.load(golden_path)
+
+def read_fault_list():
+    fault_list = []
+    path = os.path.join(os.getcwd(), 'FaultInjector', 'fault_list.csv')
+    with open(path, 'r') as file:
+        csvreader = csv.reader(file)
+        for row in csvreader:
+            fault_list.append(row)
+    fault_list.pop(0)#deleating Table name
+    return fault_list[:][:]
 
 def read_results(path):
     result_list = []
@@ -64,7 +134,7 @@ def heat_maps(results,x,y):
     try:
         os.mkdir('HeatMaps')
     except:
-        print("Failed to create heatmaps repo, already exists, resuming execution")
+        logger.warning("Failed to create heatmaps repo, already exists, resuming execution")
     os.chdir('../')
 
     jpg_plots_DIR = os.path.join(os.getcwd(),'FaultInjector', "HeatMaps")
@@ -139,9 +209,166 @@ def heat_maps(results,x,y):
     _2LRR_jpg = os.path.join(jpg_plots_DIR,'DB.png')
     plt.savefig(_2LRR_jpg)
     plt.close()
+
+def MeanRelativeError(FID, sp,results):
+    Relative_errors = []
+    for row in range(len(results)) :
+        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
+            Relative_errors.append( abs(float(Float16(results[row][8])) - float(Float16(results[row][6])))*100/ float(Float16(results[row][6]))     )
+    try:
+        return sum(Relative_errors)/len(Relative_errors)
+    except ZeroDivisionError:
+        return 0.0
+
+def Average_absolute_Error(FID,sp, results):
+    Abs_errors = []
+    for row in range(len(results)) :
+        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
+            Abs_errors.append( float(Float16(results[row][8])) - float(Float16(results[row][6])))
+    try:
+        return sum(Abs_errors)/len(Abs_errors)
+    except ZeroDivisionError:
+        return 0.0
+
+def Discrepancies_due_to_fault_injection(FID,sp,results,d_golden):
+    d_faulty = d_golden.copy()
+    for row in range(len(results)) :
+        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
+            x = int(results[row][4])
+            y = int(results[row][5])
+            d_faulty[x][y] = float(Float16(results[row][8]))
+    return  np.std(d_faulty) - np.std(d_golden)  , np.mean(d_faulty) - np.mean(d_golden)
+
+def Bit_flip_probability_Format_Float16(FID,sp,results):
     
+    Bit_flip_occurrences = []
+    for bit in range(16):
+        Bit_flip_occurrences.append(0)
+    
+    for row in range(len(results)) :
+        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
+            golden_float16 = Float16(results[row][6])
+            faulty_float16 = Float16(results[row][8])
+            golden_bits = golden_float16.bits
+            faulty_bits = faulty_float16.bits
+
+            bit_flipped = golden_bits ^ faulty_bits
+            bit = 0 #aka bit 0
+            while(bit < 16):
+                mask_float16 = Float16(pow(2,int(bit)))
+                mask = mask_float16.bits
+                if(mask & bit_flipped != 0):
+                    Bit_flip_occurrences[bit] += 1
+                bit += 1
+    for bit in range(16):#calculate P(%) of bit flip for each bit
+        try :
+            Bit_flip_occurrences[bit] = Bit_flip_occurrences[bit]*100 / sum(Bit_flip_occurrences)
+            
+        except ZeroDivisionError as e:
+            logger.warning(' Error division by zero in bit flip probabilities, returning all zero probabilities')
+            return [ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    
+    return Bit_flip_occurrences[:]
 
 
+def Faulty_Entrances_Probabilities_masks(FID,sp,results):
+    
+    Faulty_entrances = dict()
+    for row in range(len(results)) :
+        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
+            x_ = int(  int(results[row][4]) % MS ) #to find absolute position of fault propagation in CTA
+            y_ = int( int(results[row][5]) % NS ) 
+            
+            try : 
+                P, mask =  Faulty_entrances[str((x_,y_))] 
+                P += 1
+
+                golden_float16 = Float16(results[row][6])
+                faulty_float16 = Float16(results[row][8])
+                golden_bits = golden_float16.bits
+                faulty_bits = faulty_float16.bits
+                bit_flipped = golden_bits ^ faulty_bits
+
+                mask = mask & bit_flipped #in this way we only select bits thar are always flipping in that entrance in CTA
+                Faulty_entrances[str((x_,y_))] = (P, mask)
+            
+            except KeyError:
+                golden_float16 = Float16(results[row][6])
+                faulty_float16 = Float16(results[row][8])
+                golden_bits = golden_float16.bits
+                faulty_bits = faulty_float16.bits
+                bit_flipped = golden_bits ^ faulty_bits
+                Faulty_entrances.update({str((x_,y_)) : (1, bit_flipped)})
+    
+    total_curropted_entrances = 0
+    for entrance in Faulty_entrances:
+        P,mask = Faulty_entrances[entrance]
+        if P == 1 :
+            mask = None #is useless to store bits that are always flipping if entrance has been curropted only once
+            Faulty_entrances[entrance] = (P,mask)
+        else:
+            Faulty_entrances[entrance] = (P,hex(mask))
+        total_curropted_entrances += P
+        
+    
+    for entrance in Faulty_entrances :
+        P,mask = Faulty_entrances[entrance]
+        P = P*100/total_curropted_entrances
+        Faulty_entrances[entrance] = (P,mask)
+
+    return Faulty_entrances
+
+
+def fault_info_extrapolation(fault_id, sp,results):
+    
+    if(format_type == 'float16'):
+        fault_error_model = {
+            'FaultID': fault_id,
+            'Scheduler': sp,
+            'MeanRelativeError(%)': None,
+            'AverageAbsoluteError': None,# faulty - golden
+            'Discrepancy_Avg_against_golden_avg': None,
+            'Discrepancy_Std_against_golden_std': None,#these 2 parameters might be used for fault detection
+            'BitFlipProbabilities': {
+                'P(bit15)': 0.0,
+                'P(bit14)': 0.0,
+                'P(bit13)': 0.0,
+                'P(bit12)': 0.0,
+                'P(bit11)': 0.0,
+                'P(bit10)': 0.0,
+                'P(bit9)': 0.0,
+                'P(bit8)': 0.0,
+                'P(bit7)': 0.0,
+                'P(bit6)': 0.0,
+                'P(bit5)': 0.0,
+                'P(bit4)': 0.0,
+                'P(bit3)': 0.0,
+                'P(bit2)': 0.0,
+                'P(bit1)': 0.0,
+                'P(bit0)': 0.0
+
+            },
+            'FaultyEntrancesCTA': dict()#this is a dictionary with key (x,y) : (Probability of curroption of that entrance, Mask to apply)
+                                         # X , Y are inegered between Ms, Ns --> if CTA is associated to faulty HW which are the entrances of to curropt
+                                         # Mask to apply is usually set to 'None' and probabilities of bit flip are explited to curropt data in 
+                                         # injector model but if  particular bit flips are always occuring a mask is provided   
+
+        }
+        fault_error_model['MeanRelativeError(%)'] = MeanRelativeError(fault_id, sp, results)
+        fault_error_model['AverageAbsoluteError'] = Average_absolute_Error(fault_id,sp,results)
+
+        d = read_matrix('d')
+        fault_error_model['Discrepancy_Std_against_golden_std'],fault_error_model['Discrepancy_Avg_against_golden_avg'] = Discrepancies_due_to_fault_injection(fault_id,sp,results,d)
+
+        bit_flip_probabilities = Bit_flip_probability_Format_Float16(fault_id,sp,results)
+        for bit in range(len(bit_flip_probabilities)):
+            fault_error_model['BitFlipProbabilities']['P(bit'+str(bit)+')'] = bit_flip_probabilities[bit]
+
+        fault_error_model['FaultyEntrancesCTA'] = Faulty_Entrances_Probabilities_masks(fault_id,sp,results)
+        return fault_error_model
+    else:
+        logger.warning('Not supported data format please change it in default.yalm')
+        sys.exit()
 
 
 
@@ -149,5 +376,26 @@ def validator(x, y):
     results_path = os.path.join(os.getcwd(), 'FaultInjector', 'results.csv')
     results = read_results(results_path)
     heat_maps(results,x,y)
+
+
+    #Now I extrapolate and store all the informations required for error modelling of fault injections
+    os.chdir('FaultInjector')
+    try:
+        os.mkdir('ErrorModel')
+    except:
+        logger.warning("Failed to create ErrorModel repo, already exists, resuming execution")
+    os.chdir('../')
+    
+    faults = read_fault_list()
+    Faults_Error_Model_List = []
+    for f in range(1000):#len(faults)
+        Faults_Error_Model_List.append(fault_info_extrapolation(int(faults[f][3]),str(faults[f][0]),results) )
+
+    path = os.path.join(os.getcwd(), 'FaultInjector', 'ErrorModel', 'FaultsErrorModel.json')
+    write_Json(Faults_Error_Model_List,path)
+    path = os.path.join(os.getcwd(), 'FaultInjector', 'ErrorModel', 'FaultsErrorModel.csv')
+    write_csv(Faults_Error_Model_List,path)
+
+    logger.warning('Validator module completed')
 
     

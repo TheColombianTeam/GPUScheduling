@@ -2,6 +2,7 @@ import os
 from utils.args import args 
 
 import csv
+from log.logger import logger
 
 exaustive_test_n_faults = args.faults.exaustive_test
 n_fault_to_inject = args.faults.faults_to_inject
@@ -40,5 +41,5 @@ def fault_list(faulty_SM = 0, faulty_cluster = 0):
     save_fault_list(file_ptr, FIDs, faulty_SM, faulty_cluster)
     file_ptr.close()
 
-    print("Fault list module completed") 
+    logger.waring("Fault list module completed") 
     

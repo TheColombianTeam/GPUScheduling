@@ -85,4 +85,4 @@ def golden(A_x_dim, A_B_common_dim, B_y_dim, min_value = 0, max_value = 1):
     CTA_allocation_and_scheduler_vaidation(DistributedCTA_scheduler,a,b,c,d_)
     CTA_allocation_and_scheduler_vaidation(DistributedBlock_scheduler,a,b,c,d_)
 
-    print("Golden value module completed \n")
+    logger.warning("Golden value module completed \n")

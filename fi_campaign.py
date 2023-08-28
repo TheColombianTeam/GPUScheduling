@@ -8,7 +8,9 @@ import numpy as np
 
 import os, sys, time
 import csv,json
+
 import multiprocessing as mp
+from log.logger import logger
 
 workers = int(args.workers)
 
@@ -67,12 +69,13 @@ def save_results(shared_faults_Queue):
             
 
 if __name__=="__main__":
+    validator(120,120)
+    sys.exit()
     golden(120,120,120)
     fault_list()
-
     #now I'm preparing the env to support multiprocessing with threads accessing same file for ouput storing through a Queue 
     if(workers <= 0):
-        print(" Error number of process set through number of workers must be bigger then 0")
+        logger.warning(" Error number of process set through number of workers must be bigger then 0")
         sys.exit()
     
     a = read_matrix('a')
@@ -87,7 +90,7 @@ if __name__=="__main__":
     CTAs_DB = read_json('distributed_block')
 
     faults_list = read_fault_list()
-    n_faults_to_inject = 100#len(faults_list)
+    n_faults_to_inject = len(faults_list)
     injected_faults = 0
 
     manager = mp.Manager()
@@ -110,13 +113,13 @@ if __name__=="__main__":
     shared_faults_Queue.put('#done#')#exiting infinite loop in process writing file with data from Queue
 
     end = time.time()
-    print("ellapsed time for 100 fault injections : " +str((end-beg)/60)+ ' min ')
+    logger.warning("ellapsed time for fault injections campaign: " +str((end-beg)/60)+ ' min ')
     injector_pool.close()
     injector_pool.join()
 
     storing_results_pool.close()
     storing_results_pool.join()
 
-    print('Fault injector campaign completed')    
+    logger.warning('Fault injector campaign completed')    
             
     validator(120,120)#this function needs output tensor dimentions inposed in golden for heat map bins 
