@@ -28,7 +28,7 @@ def write_csv(Models,path):
     Table_Title = ['FaultID','Scheduling Policy', 'MeanRelativeError(%)','AverageAbsoluteError','Discrepancy Average activations', 'Discrepancy Standard Deviation activations',
                    'Bit 0 Flip Probability', 'Bit 1 Flip Probability','Bit 2 Flip Probability','Bit 3 Flip Probability','Bit 4 Flip Probability','Bit 5 Flip Probability',
                    'Bit 6 Flip Probability','Bit 7 Flip Probability','Bit 8 Flip Probability','Bit 9 Flip Probability','Bit 10 Flip Probability','Bit 11 Flip Probability',
-                   'Bit 12 Flip Probability','Bit 13 Flip Probability','Bit 14 Flip Probability','Bit 15 Flip Probability','Entrance', 'Probability of entrance curroption(%)','Mask', 'Ripetition...']
+                   'Bit 12 Flip Probability','Bit 13 Flip Probability','Bit 14 Flip Probability','Bit 15 Flip Probability','Entrance', 'Probability of entrance curroption(%)','Mask','Average number of bit flip' ,'Ripetition...']
 
     writer.writerow(Table_Title)
     for fault in range(len(Models)):
@@ -60,12 +60,37 @@ def write_csv(Models,path):
         
         for entrance in Models[fault]['FaultyEntrancesCTA']:
             row.append(entrance)
-            P,mask = Models[fault]['FaultyEntrancesCTA'][entrance]
+            P,mask, avg = Models[fault]['FaultyEntrancesCTA'][entrance]
             row.append(P)
             row.append(mask)
+            row.append(avg)
         writer.writerow(row)
 
     file_ptr.close()
+
+def number_of_faulty_CTAs(scheduler, TargetCluster, TargetSM):
+    
+    if scheduler == 'TwoLevelRoundRobin':
+        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'two_level_round_robin.json')
+    elif scheduler == 'GlobalRoundRobin':
+        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'global_level_round_robin.json')
+    elif scheduler == 'Greedy':
+        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'greddy.json')
+    elif scheduler == 'DistributedCTA':
+        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'distributed_CTA.json')
+    elif scheduler == 'DistributedBlock':
+        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'distributed_block.json')
+    else:
+        print(' wrong scheduler')
+        sys.exit()
+
+    n_corrupted_CTA = 0
+    with open(path,  encoding='utf-8') as json_file:
+        CTAs = json.load(json_file)
+        for CTA in range(len(CTAs)):
+            if CTAs[CTA]["Cluster"] ==  TargetCluster and CTAs[CTA]['SM'] == TargetSM :
+                n_corrupted_CTA += 1
+    return n_corrupted_CTA 
 
 def read_matrix(filename):
     path = os.getcwd()
@@ -280,7 +305,7 @@ def Faulty_Entrances_Probabilities_masks(FID,sp,results):
             y_ = int( int(results[row][5]) % NS ) 
             
             try : 
-                P, mask =  Faulty_entrances[str((x_,y_))] 
+                P, bit_always_flipping, Average_number_of_bit_flip =  Faulty_entrances[str((x_,y_))] 
                 P += 1
 
                 golden_float16 = Float16(results[row][6])
@@ -289,8 +314,17 @@ def Faulty_Entrances_Probabilities_masks(FID,sp,results):
                 faulty_bits = faulty_float16.bits
                 bit_flipped = golden_bits ^ faulty_bits
 
-                mask = mask & bit_flipped #in this way we only select bits thar are always flipping in that entrance in CTA
-                Faulty_entrances[str((x_,y_))] = (P, mask)
+                bit_always_flipping = bit_always_flipping & bit_flipped #in this way we only select bits thar are always flipping in that entrance in CTA
+                
+                bit = 0 #aka bit 0
+                while(bit < 16):
+                    mask_float16 = Float16(pow(2,int(bit)))
+                    mask = mask_float16.bits
+                    if(mask & bit_flipped != 0):
+                        Average_number_of_bit_flip += 1
+                    bit += 1
+
+                Faulty_entrances[str((x_,y_))] = (P, bit_always_flipping, Average_number_of_bit_flip)
             
             except KeyError:
                 golden_float16 = Float16(results[row][6])
@@ -298,24 +332,33 @@ def Faulty_Entrances_Probabilities_masks(FID,sp,results):
                 golden_bits = golden_float16.bits
                 faulty_bits = faulty_float16.bits
                 bit_flipped = golden_bits ^ faulty_bits
-                Faulty_entrances.update({str((x_,y_)) : (1, bit_flipped)})
+                
+                bit = 0 #aka bit 0
+                Average_number_of_bit_flip = 0
+                while(bit < 16):
+                    mask_float16 = Float16(pow(2,int(bit)))
+                    mask = mask_float16.bits
+                    if(mask & bit_flipped != 0):
+                        Average_number_of_bit_flip += 1
+                    bit += 1
+
+                Faulty_entrances.update({str((x_,y_)) : (1, bit_flipped, Average_number_of_bit_flip)})
     
-    total_curropted_entrances = 0
+    
     for entrance in Faulty_entrances:
-        P,mask = Faulty_entrances[entrance]
+        P,mask,Average_number_of_bit_flip = Faulty_entrances[entrance]
         if P == 1 :
             mask = None #is useless to store bits that are always flipping if entrance has been curropted only once
-            Faulty_entrances[entrance] = (P,mask)
+            P = P*100/ number_of_faulty_CTAs(str(results[row][0]), int(results[0][1]), int(results[0][2]))#Target Cluster and SM are always the same
+            Faulty_entrances[entrance] = (P,mask, Average_number_of_bit_flip)
         else:
-            Faulty_entrances[entrance] = (P,hex(mask))
-        total_curropted_entrances += P
+            try :
+                Average_number_of_bit_flip /= P 
+            except ZeroDivisionError :
+                Average_number_of_bit_flip = 0
+            P = P*100/ number_of_faulty_CTAs(str(results[row][0]), int(results[0][1]), int(results[0][2]))
+            Faulty_entrances[entrance] = (P,hex(mask), Average_number_of_bit_flip)
         
-    
-    for entrance in Faulty_entrances :
-        P,mask = Faulty_entrances[entrance]
-        P = P*100/total_curropted_entrances
-        Faulty_entrances[entrance] = (P,mask)
-
     return Faulty_entrances
 
 
@@ -348,11 +391,12 @@ def fault_info_extrapolation(fault_id, sp,results):
                 'P(bit0)': 0.0
 
             },
-            'FaultyEntrancesCTA': dict()#this is a dictionary with key (x,y) : (Probability of curroption of that entrance, Mask to apply)
+            'FaultyEntrancesCTA': dict()#this is a dictionary with key (x,y) : (Probability of curroption of that entrance, Mask to apply, Average number of bit flip)
                                          # X , Y are inegered between Ms, Ns --> if CTA is associated to faulty HW which are the entrances of to curropt
                                          # Mask to apply is usually set to 'None' and probabilities of bit flip are explited to curropt data in 
                                          # injector model but if  particular bit flips are always occuring a mask is provided   
-
+                                         # Average number of bit flip is going to be explited to generate the mask using both always flipping bits and 
+                                         # randomly generated bits to flip according to probability of bit flip
         }
         fault_error_model['MeanRelativeError(%)'] = MeanRelativeError(fault_id, sp, results)
         fault_error_model['AverageAbsoluteError'] = Average_absolute_Error(fault_id,sp,results)
