@@ -432,7 +432,7 @@ def validator(x, y):
     
     faults = read_fault_list()
     Faults_Error_Model_List = []
-    for f in range(1000):#len(faults)
+    for f in range(len(faults)):
         Faults_Error_Model_List.append(fault_info_extrapolation(int(faults[f][3]),str(faults[f][0]),results) )
 
     path = os.path.join(os.getcwd(), 'FaultInjector', 'ErrorModel', 'FaultsErrorModel.json')

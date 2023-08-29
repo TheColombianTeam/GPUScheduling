@@ -69,8 +69,7 @@ def save_results(shared_faults_Queue):
             
 
 if __name__=="__main__":
-    validator(120,120)
-    sys.exit()
+
     golden(120,120,120)
     fault_list()
     #now I'm preparing the env to support multiprocessing with threads accessing same file for ouput storing through a Queue 
