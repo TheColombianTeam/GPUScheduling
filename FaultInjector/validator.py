@@ -285,9 +285,11 @@ def Bit_flip_probability_Format_Float16(FID,sp,results):
                 if(mask & bit_flipped != 0):
                     Bit_flip_occurrences[bit] += 1
                 bit += 1
+    
+    all_bit_flips = sum(Bit_flip_occurrences)
     for bit in range(16):#calculate P(%) of bit flip for each bit
         try :
-            Bit_flip_occurrences[bit] = Bit_flip_occurrences[bit]*100 / sum(Bit_flip_occurrences)
+            Bit_flip_occurrences[bit] = Bit_flip_occurrences[bit]*100 / all_bit_flips
             
         except ZeroDivisionError as e:
             logger.warning(' Error division by zero in bit flip probabilities, returning all zero probabilities')
