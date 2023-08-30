@@ -1,3 +1,14 @@
+#!/bin/bash
+#SBATCH --job-name=SCHEDULERS
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=s303438@studenti.polito.it
+#SBATCH --partition=global
+#SBATCH --time=240:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=32
+#SBATCH --output=/home/fpessia/Schedulers/Jetson_terminal.txt
+
+
 dir=`pwd`
 
 for config in $dir/configs/*
