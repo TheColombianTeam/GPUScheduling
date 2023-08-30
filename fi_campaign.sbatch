@@ -8,12 +8,12 @@
 #SBATCH --ntasks-per-node=32
 #SBATCH --output=/home/fpessia/Schedulers/Jetson_terminal.txt
 
+dir=`pwd`
+
 cd ../
 source /home/fpessia/Python/bin/activate
 echo "Python env setted"
 cd Schedulers
-
-dir=`pwd`
 
 for config in $dir/configs/*
 do
