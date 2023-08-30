@@ -1,4 +1,4 @@
 gpu:
-  sm: 8
-  cluster: 2
+  sm: 1
+  cluster: 1
   CTAs_buffer: 1

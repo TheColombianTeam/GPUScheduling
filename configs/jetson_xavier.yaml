@@ -1,5 +1,3 @@
-name: jetson_xavier # name of the experiment needed for the logs
-
 gpu:
   sm: 8
   cluster: 1
