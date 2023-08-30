@@ -20,4 +20,4 @@ mxm:
   NS: 16 # for now, this value is constant
   KS: 16 # for now, this value is constant
 
-workers: 12
+workers: 32
