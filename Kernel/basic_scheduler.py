@@ -70,11 +70,11 @@ def scheduler(a, b, c, tensor):
     a_shape = a.shape
     b_shape = b.shape
     c_shape = c.shape
-    for row_c in range(c_shape[0] // MS): #-
-        new_row_c_start = MS * row_c #----- X
+    for row_c in range(c_shape[0] // MS):  # -
+        new_row_c_start = MS * row_c  # ----- X
         new_row_c_end = new_row_c_start + MS
-        for column_c in range(c_shape[1] // NS): #-
-            new_column_c_start = NS * column_c #----- Y
+        for column_c in range(c_shape[1] // NS):  # -
+            new_column_c_start = NS * column_c  # ----- Y
             new_column_c_end = new_column_c_start + NS
             new_row_a_start = new_row_c_start
             new_row_a_end = new_row_c_end

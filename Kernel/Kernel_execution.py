@@ -10,6 +10,7 @@ MS = args.mxm.MS
 NS = args.mxm.NS
 KS = args.mxm.KS
 
+
 def complete(matrix):
     shape = matrix.shape
     if (shape[0] % MS) > 0:
@@ -24,6 +25,7 @@ def complete(matrix):
     new_matrix = np.zeros(new_shape)
     new_matrix[: shape[0], : shape[1]] = matrix
     return new_matrix
+
 
 # This method represent the warp scheduler - NOT CHANGES
 def scheduler_sm(a, b, c, tensor):
@@ -102,7 +104,8 @@ def gpu_kernel_execution(a, b, c, CTAs, tensor):
             ] = c_block
     return c
 
-def faulty_Kernel_execution(a,b,c,d,CTAs, faulty_cluster, faulty_SM,fault_ID):
+
+def faulty_Kernel_execution(a, b, c, d, CTAs, faulty_cluster, faulty_SM, fault_ID):
     d = complete(d)
     a = complete(a)
     b = complete(b)
@@ -119,7 +122,7 @@ def faulty_Kernel_execution(a,b,c,d,CTAs, faulty_cluster, faulty_SM,fault_ID):
         new_column_c_start = CTA["CTA"]["y"]
         new_column_c_end = new_column_c_start + NS
 
-        if(int(cluster) == faulty_cluster and int(sm) == faulty_SM):
+        if int(cluster) == faulty_cluster and int(sm) == faulty_SM:
             new_row_a_start = new_row_c_start
             new_row_a_end = new_row_c_end
             new_column_b_start = new_column_c_start
@@ -146,16 +149,8 @@ def faulty_Kernel_execution(a,b,c,d,CTAs, faulty_cluster, faulty_SM,fault_ID):
                     new_row_c_start:new_row_c_end, new_column_c_start:new_column_c_end
                 ] = c_block
 
-        else : 
-            c[
-                    new_row_c_start:new_row_c_end, new_column_c_start:new_column_c_end
-                ]  =    d[
-                    new_row_c_start:new_row_c_end, new_column_c_start:new_column_c_end
-                ]
+        else:
+            c[new_row_c_start:new_row_c_end, new_column_c_start:new_column_c_end] = d[
+                new_row_c_start:new_row_c_end, new_column_c_start:new_column_c_end
+            ]
     return c
-
-
-
-            
-
-

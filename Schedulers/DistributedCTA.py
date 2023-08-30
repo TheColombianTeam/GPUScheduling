@@ -2,7 +2,7 @@ from utils.args import args
 
 
 from .models import Scheduler
-from .utils import complete, save_csv,save_json
+from .utils import complete, save_csv, save_json
 
 
 MS = args.mxm.MS
@@ -27,33 +27,32 @@ class DistributedCTA(Scheduler.Scheduler):
         to_schedule_CTAs_per_cluster = []
         for c in range(self._n_clusters):
             to_schedule_CTAs_per_cluster.append([])
-            
+
         total_num_of_CTA = len(self.__scheduler_info)
         left_to_schedule = int(total_num_of_CTA % self._n_clusters)
 
-        
         already_scheduled_CTA = []
         for c in range(self._n_clusters):
             if c < left_to_schedule:
                 additional_CTA = 1
             else:
                 additional_CTA = 0
-            count = int(total_num_of_CTA/self._n_clusters)+ additional_CTA
+            count = int(total_num_of_CTA / self._n_clusters) + additional_CTA
             for i in range(c):
                 count += already_scheduled_CTA[i]
             already_scheduled_CTA.append(count)
-            
-        cluster_id  = 0
-        #CLUSTER SCHEDULING, per-cluster Pool of CTA generation
+
+        cluster_id = 0
+        # CLUSTER SCHEDULING, per-cluster Pool of CTA generation
         for CTA_id in range(total_num_of_CTA):
-            if(CTA_id < already_scheduled_CTA[cluster_id]):
+            if CTA_id < already_scheduled_CTA[cluster_id]:
                 self.__scheduler_info[CTA_id]["Cluster"] = cluster_id
                 to_schedule_CTAs_per_cluster[cluster_id].append(CTA_id)
             else:
                 cluster_id += 1
                 self.__scheduler_info[CTA_id]["Cluster"] = cluster_id
                 to_schedule_CTAs_per_cluster[cluster_id].append(CTA_id)
-        
+
         # It goes without saying that this procedure is static per each CTA
         # SM SCHEDULING
         for c in range(self._n_clusters):
@@ -119,6 +118,6 @@ class DistributedCTA(Scheduler.Scheduler):
 
     def __create_dict(self, CTA_info):
         self.__scheduler_info.append(CTA_info)
-    
+
     def read_name(self):
         return self._name

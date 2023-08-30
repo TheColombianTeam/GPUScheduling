@@ -1,11 +1,11 @@
-import os,sys
-import csv,json
+import os, sys
+import csv, json
 
 import seaborn as sbr
 from sfpy import *
 
 import matplotlib.pyplot as plt
-from matplotlib import  cm
+from matplotlib import cm
 
 import numpy as np
 from utils.args import args
@@ -16,51 +16,77 @@ NS = args.mxm.NS
 format_type = str(args.config.format)
 
 
-def write_Json(Models,path):
-    path = os.path.join(os.getcwd(), 'FaultInjector', 'ErrorModel', 'FaultsErrorModel.json')
+def write_Json(Models, path):
+    path = os.path.join(
+        os.getcwd(), "FaultInjector", "ErrorModel", "FaultsErrorModel.json"
+    )
     with open(path, "w+") as JSONfile:
-            json.dump(Models,JSONfile)        
+        json.dump(Models, JSONfile)
     JSONfile.close()
 
-def write_csv(Models,path):
+
+def write_csv(Models, path):
     file_ptr = open(path, "w+")
     writer = csv.writer(file_ptr)
-    Table_Title = ['FaultID','Scheduling Policy', 'MeanRelativeError(%)','AverageAbsoluteError','Discrepancy Average activations', 'Discrepancy Standard Deviation activations',
-                   'Bit 0 Flip Probability', 'Bit 1 Flip Probability','Bit 2 Flip Probability','Bit 3 Flip Probability','Bit 4 Flip Probability','Bit 5 Flip Probability',
-                   'Bit 6 Flip Probability','Bit 7 Flip Probability','Bit 8 Flip Probability','Bit 9 Flip Probability','Bit 10 Flip Probability','Bit 11 Flip Probability',
-                   'Bit 12 Flip Probability','Bit 13 Flip Probability','Bit 14 Flip Probability','Bit 15 Flip Probability','Entrance', 'Probability of entrance curroption(%)','Mask','Average number of bit flip' ,'Ripetition...']
+    Table_Title = [
+        "FaultID",
+        "Scheduling Policy",
+        "MeanRelativeError(%)",
+        "AverageAbsoluteError",
+        "Discrepancy Average activations",
+        "Discrepancy Standard Deviation activations",
+        "Bit 0 Flip Probability",
+        "Bit 1 Flip Probability",
+        "Bit 2 Flip Probability",
+        "Bit 3 Flip Probability",
+        "Bit 4 Flip Probability",
+        "Bit 5 Flip Probability",
+        "Bit 6 Flip Probability",
+        "Bit 7 Flip Probability",
+        "Bit 8 Flip Probability",
+        "Bit 9 Flip Probability",
+        "Bit 10 Flip Probability",
+        "Bit 11 Flip Probability",
+        "Bit 12 Flip Probability",
+        "Bit 13 Flip Probability",
+        "Bit 14 Flip Probability",
+        "Bit 15 Flip Probability",
+        "Entrance",
+        "Probability of entrance curroption(%)",
+        "Mask",
+        "Average number of bit flip",
+        "Ripetition...",
+    ]
 
     writer.writerow(Table_Title)
     for fault in range(len(Models)):
         row = []
-        row.append(Models[fault]['FaultID'])
-        row.append(Models[fault]['Scheduler'])
-        row.append(Models[fault]['MeanRelativeError(%)'])
-        row.append(Models[fault]['AverageAbsoluteError'])
-        row.append(Models[fault]['Discrepancy_Avg_against_golden_avg'])
-        row.append(Models[fault]['Discrepancy_Std_against_golden_std'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit0)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit1)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit2)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit3)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit4)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit5)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit6)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit7)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit8)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit9)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit10)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit11)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit12)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit13)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit14)'])
-        row.append(Models[fault]['BitFlipProbabilities']['P(bit15)'])
-        
-        
-        
-        for entrance in Models[fault]['FaultyEntrancesCTA']:
+        row.append(Models[fault]["FaultID"])
+        row.append(Models[fault]["Scheduler"])
+        row.append(Models[fault]["MeanRelativeError(%)"])
+        row.append(Models[fault]["AverageAbsoluteError"])
+        row.append(Models[fault]["Discrepancy_Avg_against_golden_avg"])
+        row.append(Models[fault]["Discrepancy_Std_against_golden_std"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit0)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit1)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit2)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit3)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit4)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit5)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit6)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit7)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit8)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit9)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit10)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit11)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit12)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit13)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit14)"])
+        row.append(Models[fault]["BitFlipProbabilities"]["P(bit15)"])
+
+        for entrance in Models[fault]["FaultyEntrancesCTA"]:
             row.append(entrance)
-            P,mask, avg = Models[fault]['FaultyEntrancesCTA'][entrance]
+            P, mask, avg = Models[fault]["FaultyEntrancesCTA"][entrance]
             row.append(P)
             row.append(mask)
             row.append(avg)
@@ -68,84 +94,104 @@ def write_csv(Models,path):
 
     file_ptr.close()
 
+
 def number_of_faulty_CTAs(scheduler, TargetCluster, TargetSM):
-    
-    if scheduler == 'TwoLevelRoundRobin':
-        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'two_level_round_robin.json')
-    elif scheduler == 'GlobalRoundRobin':
-        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'global_level_round_robin.json')
-    elif scheduler == 'Greedy':
-        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'greddy.json')
-    elif scheduler == 'DistributedCTA':
-        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'distributed_CTA.json')
-    elif scheduler == 'DistributedBlock':
-        path = os.path.join(os.getcwd(), 'Schedulers', 'scheduled', 'distributed_block.json')
+    if scheduler == "TwoLevelRoundRobin":
+        path = os.path.join(
+            os.getcwd(), "Schedulers", "scheduled", "two_level_round_robin.json"
+        )
+    elif scheduler == "GlobalRoundRobin":
+        path = os.path.join(
+            os.getcwd(), "Schedulers", "scheduled", "global_level_round_robin.json"
+        )
+    elif scheduler == "Greedy":
+        path = os.path.join(os.getcwd(), "Schedulers", "scheduled", "greddy.json")
+    elif scheduler == "DistributedCTA":
+        path = os.path.join(
+            os.getcwd(), "Schedulers", "scheduled", "distributed_CTA.json"
+        )
+    elif scheduler == "DistributedBlock":
+        path = os.path.join(
+            os.getcwd(), "Schedulers", "scheduled", "distributed_block.json"
+        )
     else:
-        print(' wrong scheduler')
+        print(" wrong scheduler")
         sys.exit()
 
     n_corrupted_CTA = 0
-    with open(path,  encoding='utf-8') as json_file:
+    with open(path, encoding="utf-8") as json_file:
         CTAs = json.load(json_file)
         for CTA in range(len(CTAs)):
-            if CTAs[CTA]["Cluster"] ==  TargetCluster and CTAs[CTA]['SM'] == TargetSM :
+            if CTAs[CTA]["Cluster"] == TargetCluster and CTAs[CTA]["SM"] == TargetSM:
                 n_corrupted_CTA += 1
-    return n_corrupted_CTA 
+    return n_corrupted_CTA
+
 
 def read_matrix(filename):
     path = os.getcwd()
     golden_path = os.path.join(path, "golden", filename + ".npy")
     return np.load(golden_path)
 
+
 def read_fault_list():
     fault_list = []
-    path = os.path.join(os.getcwd(), 'FaultInjector', 'fault_list.csv')
-    with open(path, 'r') as file:
+    path = os.path.join(os.getcwd(), "FaultInjector", "fault_list.csv")
+    with open(path, "r") as file:
         csvreader = csv.reader(file)
         for row in csvreader:
             fault_list.append(row)
-    fault_list.pop(0)#deleating Table name
+    fault_list.pop(0)  # deleating Table name
     return fault_list[:][:]
+
 
 def read_results(path):
     result_list = []
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         csvreader = csv.reader(file)
         for row in csvreader:
             result_list.append(row)
-    result_list.pop(0)#deleating Table name
+    result_list.pop(0)  # deleating Table name
     return result_list[:][:]
 
-def heat_maps(results,x,y):
-    #HEAT MAP GENERATION
-    x_coordinates ={
-        'TwoLevelRoundRobin' : [],
-        'GlobalRoundRobin'   : [],
-        'Greedy':              [],
-        'DistributedCTA':      [],
-        'DistributedBlock':    []
+
+def heat_maps(results, x, y):
+    # HEAT MAP GENERATION
+    x_coordinates = {
+        "TwoLevelRoundRobin": [],
+        "GlobalRoundRobin": [],
+        "Greedy": [],
+        "DistributedCTA": [],
+        "DistributedBlock": [],
     }
 
-
-    y_coordinates ={
-        'TwoLevelRoundRobin' : [],
-        'GlobalRoundRobin'   : [],
-        'Greedy':              [],
-        'DistributedCTA':      [],
-        'DistributedBlock':    []
+    y_coordinates = {
+        "TwoLevelRoundRobin": [],
+        "GlobalRoundRobin": [],
+        "Greedy": [],
+        "DistributedCTA": [],
+        "DistributedBlock": [],
     }
 
     for fault_entrance in range(len(results)):
-        x_coordinates[str(results[fault_entrance][0])].append(int(results[fault_entrance][4]))
-        y_coordinates[str(results[fault_entrance][0])].append(int(results[fault_entrance][5]))
+        x_coordinates[str(results[fault_entrance][0])].append(
+            int(results[fault_entrance][4])
+        )
+        y_coordinates[str(results[fault_entrance][0])].append(
+            int(results[fault_entrance][5])
+        )
 
-    #GENERATING PLOTS
-    x_grid = np.arange(0,x, MS)
+    # GENERATING PLOTS
+    x_grid = np.arange(0, x, MS)
     y_grid = np.arange(0, y, NS)
 
-    #2LRR
-    plt.hist2d(x_coordinates['TwoLevelRoundRobin'],y_coordinates['TwoLevelRoundRobin'], bins=(x+1,y+1), 
-                                                                    cmap=cm.gist_rainbow, range=[(0,x),(0,y)])
+    # 2LRR
+    plt.hist2d(
+        x_coordinates["TwoLevelRoundRobin"],
+        y_coordinates["TwoLevelRoundRobin"],
+        bins=(x + 1, y + 1),
+        cmap=cm.gist_rainbow,
+        range=[(0, x), (0, y)],
+    )
     plt.title("Faulty entrances output tensor Two level Round Robin Scheduler")
     plt.xlabel("output tensor x coordinates")
     plt.ylabel("output tensot y coordintes")
@@ -153,23 +199,30 @@ def heat_maps(results,x,y):
 
     plt.xticks(x_grid)
     plt.yticks(y_grid)
-    plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+    plt.grid(color="black", linestyle="--", linewidth=0.5)
 
-    os.chdir('FaultInjector')
+    os.chdir("FaultInjector")
     try:
-        os.mkdir('HeatMaps')
+        os.mkdir("HeatMaps")
     except:
-        logger.warning("Failed to create heatmaps repo, already exists, resuming execution")
-    os.chdir('../')
+        logger.warning(
+            "Failed to create heatmaps repo, already exists, resuming execution"
+        )
+    os.chdir("../")
 
-    jpg_plots_DIR = os.path.join(os.getcwd(),'FaultInjector', "HeatMaps")
-    _2LRR_jpg = os.path.join(jpg_plots_DIR, '2LRR.png')
+    jpg_plots_DIR = os.path.join(os.getcwd(), "FaultInjector", "HeatMaps")
+    _2LRR_jpg = os.path.join(jpg_plots_DIR, "2LRR.png")
     plt.savefig(_2LRR_jpg)
     plt.close()
 
-    #GRR
-    plt.hist2d(x_coordinates['GlobalRoundRobin'],y_coordinates['GlobalRoundRobin'], bins=(x+1,y+1), 
-                                                                    cmap=cm.gist_rainbow, range=[(0,x),(0,y)])
+    # GRR
+    plt.hist2d(
+        x_coordinates["GlobalRoundRobin"],
+        y_coordinates["GlobalRoundRobin"],
+        bins=(x + 1, y + 1),
+        cmap=cm.gist_rainbow,
+        range=[(0, x), (0, y)],
+    )
     plt.title("Faulty entrances output tensor Global Round Robin Scheduler")
     plt.xlabel("output tensor x coordinates")
     plt.ylabel("output tensot y coordintes")
@@ -177,16 +230,21 @@ def heat_maps(results,x,y):
 
     plt.xticks(x_grid)
     plt.yticks(y_grid)
-    plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+    plt.grid(color="black", linestyle="--", linewidth=0.5)
 
-    jpg_plots_DIR = os.path.join(os.getcwd(),'FaultInjector', "HeatMaps")
-    _2LRR_jpg = os.path.join(jpg_plots_DIR,'GRR.png')
+    jpg_plots_DIR = os.path.join(os.getcwd(), "FaultInjector", "HeatMaps")
+    _2LRR_jpg = os.path.join(jpg_plots_DIR, "GRR.png")
     plt.savefig(_2LRR_jpg)
     plt.close()
 
-    #greedy
-    plt.hist2d(x_coordinates['Greedy'],y_coordinates['Greedy'], bins=(x+1,y+1), 
-                                                                    cmap=cm.gist_rainbow, range=[(0,x),(0,y)])
+    # greedy
+    plt.hist2d(
+        x_coordinates["Greedy"],
+        y_coordinates["Greedy"],
+        bins=(x + 1, y + 1),
+        cmap=cm.gist_rainbow,
+        range=[(0, x), (0, y)],
+    )
     plt.title("Faulty entrances output tensor Greedy Scheduler")
     plt.xlabel("output tensor x coordinates")
     plt.ylabel("output tensot y coordintes")
@@ -194,16 +252,21 @@ def heat_maps(results,x,y):
 
     plt.xticks(x_grid)
     plt.yticks(y_grid)
-    plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+    plt.grid(color="black", linestyle="--", linewidth=0.5)
 
-    jpg_plots_DIR = os.path.join(os.getcwd(),'FaultInjector', "HeatMaps")
-    _2LRR_jpg = os.path.join(jpg_plots_DIR,'Greedy.png')
+    jpg_plots_DIR = os.path.join(os.getcwd(), "FaultInjector", "HeatMaps")
+    _2LRR_jpg = os.path.join(jpg_plots_DIR, "Greedy.png")
     plt.savefig(_2LRR_jpg)
     plt.close()
 
-    #DCTA
-    plt.hist2d(x_coordinates['DistributedCTA'],y_coordinates['DistributedCTA'], bins=(x+1,y+1), 
-                                                                    cmap=cm.gist_rainbow, range=[(0,x),(0,y)])
+    # DCTA
+    plt.hist2d(
+        x_coordinates["DistributedCTA"],
+        y_coordinates["DistributedCTA"],
+        bins=(x + 1, y + 1),
+        cmap=cm.gist_rainbow,
+        range=[(0, x), (0, y)],
+    )
     plt.title("Faulty entrances output tensor Distributed CTA Scheduler")
     plt.xlabel("output tensor x coordinates")
     plt.ylabel("output tensot y coordintes")
@@ -211,16 +274,21 @@ def heat_maps(results,x,y):
 
     plt.xticks(x_grid)
     plt.yticks(y_grid)
-    plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+    plt.grid(color="black", linestyle="--", linewidth=0.5)
 
-    jpg_plots_DIR = os.path.join(os.getcwd(),'FaultInjector', "HeatMaps")
-    _2LRR_jpg = os.path.join(jpg_plots_DIR,'DCTA.png')
+    jpg_plots_DIR = os.path.join(os.getcwd(), "FaultInjector", "HeatMaps")
+    _2LRR_jpg = os.path.join(jpg_plots_DIR, "DCTA.png")
     plt.savefig(_2LRR_jpg)
     plt.close()
 
-    #DB
-    plt.hist2d(x_coordinates['DistributedBlock'],y_coordinates['DistributedBlock'], bins=(x+1,y+1), 
-                                                                    cmap=cm.gist_rainbow, range=[(0,x),(0,y)])
+    # DB
+    plt.hist2d(
+        x_coordinates["DistributedBlock"],
+        y_coordinates["DistributedBlock"],
+        bins=(x + 1, y + 1),
+        cmap=cm.gist_rainbow,
+        range=[(0, x), (0, y)],
+    )
     plt.title("Faulty entrances output tensor Distributed Block Scheduler")
     plt.xlabel("output tensor x coordinates")
     plt.ylabel("output tensot y coordintes")
@@ -228,86 +296,100 @@ def heat_maps(results,x,y):
 
     plt.xticks(x_grid)
     plt.yticks(y_grid)
-    plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+    plt.grid(color="black", linestyle="--", linewidth=0.5)
 
-    jpg_plots_DIR = os.path.join(os.getcwd(),'FaultInjector', "HeatMaps")
-    _2LRR_jpg = os.path.join(jpg_plots_DIR,'DB.png')
+    jpg_plots_DIR = os.path.join(os.getcwd(), "FaultInjector", "HeatMaps")
+    _2LRR_jpg = os.path.join(jpg_plots_DIR, "DB.png")
     plt.savefig(_2LRR_jpg)
     plt.close()
 
-def MeanRelativeError(FID, sp,results):
+
+def MeanRelativeError(FID, sp, results):
     Relative_errors = []
-    for row in range(len(results)) :
-        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
-            Relative_errors.append( abs(float(Float16(results[row][8])) - float(Float16(results[row][6])))*100/ float(Float16(results[row][6]))     )
+    for row in range(len(results)):
+        if FID == int(results[row][3]) and sp == str(results[row][0]):
+            Relative_errors.append(
+                abs(float(Float16(results[row][8])) - float(Float16(results[row][6])))
+                * 100
+                / float(Float16(results[row][6]))
+            )
     try:
-        return sum(Relative_errors)/len(Relative_errors)
+        return sum(Relative_errors) / len(Relative_errors)
     except ZeroDivisionError:
         return 0.0
 
-def Average_absolute_Error(FID,sp, results):
+
+def Average_absolute_Error(FID, sp, results):
     Abs_errors = []
-    for row in range(len(results)) :
-        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
-            Abs_errors.append( float(Float16(results[row][8])) - float(Float16(results[row][6])))
+    for row in range(len(results)):
+        if FID == int(results[row][3]) and sp == str(results[row][0]):
+            Abs_errors.append(
+                float(Float16(results[row][8])) - float(Float16(results[row][6]))
+            )
     try:
-        return sum(Abs_errors)/len(Abs_errors)
+        return sum(Abs_errors) / len(Abs_errors)
     except ZeroDivisionError:
         return 0.0
 
-def Discrepancies_due_to_fault_injection(FID,sp,results,d_golden):
+
+def Discrepancies_due_to_fault_injection(FID, sp, results, d_golden):
     d_faulty = d_golden.copy()
-    for row in range(len(results)) :
-        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
+    for row in range(len(results)):
+        if FID == int(results[row][3]) and sp == str(results[row][0]):
             x = int(results[row][4])
             y = int(results[row][5])
             d_faulty[x][y] = float(Float16(results[row][8]))
-    return  np.std(d_faulty) - np.std(d_golden)  , np.mean(d_faulty) - np.mean(d_golden)
+    return np.std(d_faulty) - np.std(d_golden), np.mean(d_faulty) - np.mean(d_golden)
 
-def Bit_flip_probability_Format_Float16(FID,sp,results):
-    
+
+def Bit_flip_probability_Format_Float16(FID, sp, results):
     Bit_flip_occurrences = []
     for bit in range(16):
         Bit_flip_occurrences.append(0)
-    
-    for row in range(len(results)) :
-        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
+
+    for row in range(len(results)):
+        if FID == int(results[row][3]) and sp == str(results[row][0]):
             golden_float16 = Float16(results[row][6])
             faulty_float16 = Float16(results[row][8])
             golden_bits = golden_float16.bits
             faulty_bits = faulty_float16.bits
 
             bit_flipped = golden_bits ^ faulty_bits
-            bit = 0 #aka bit 0
-            while(bit < 16):
-                mask_float16 = Float16(pow(2,int(bit)))
+            bit = 0  # aka bit 0
+            while bit < 16:
+                mask_float16 = Float16(pow(2, int(bit)))
                 mask = mask_float16.bits
-                if(mask & bit_flipped != 0):
+                if mask & bit_flipped != 0:
                     Bit_flip_occurrences[bit] += 1
                 bit += 1
-    
+
     all_bit_flips = sum(Bit_flip_occurrences)
-    for bit in range(16):#calculate P(%) of bit flip for each bit
-        try :
-            Bit_flip_occurrences[bit] = Bit_flip_occurrences[bit]*100 / all_bit_flips
-            
+    for bit in range(16):  # calculate P(%) of bit flip for each bit
+        try:
+            Bit_flip_occurrences[bit] = Bit_flip_occurrences[bit] * 100 / all_bit_flips
+
         except ZeroDivisionError as e:
-            logger.warning(' Error division by zero in bit flip probabilities, returning all zero probabilities')
-            return [ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    
+            logger.warning(
+                " Error division by zero in bit flip probabilities, returning all zero probabilities"
+            )
+            return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
     return Bit_flip_occurrences[:]
 
 
-def Faulty_Entrances_Probabilities_masks(FID,sp,results):
-    
+def Faulty_Entrances_Probabilities_masks(FID, sp, results):
     Faulty_entrances = dict()
-    for row in range(len(results)) :
-        if( FID == int(results[row][3])  and  sp == str(results[row][0])):
-            x_ = int(  int(results[row][4]) % MS ) #to find absolute position of fault propagation in CTA
-            y_ = int( int(results[row][5]) % NS ) 
-            
-            try : 
-                P, bit_always_flipping, Average_number_of_bit_flip =  Faulty_entrances[str((x_,y_))] 
+    for row in range(len(results)):
+        if FID == int(results[row][3]) and sp == str(results[row][0]):
+            x_ = int(
+                int(results[row][4]) % MS
+            )  # to find absolute position of fault propagation in CTA
+            y_ = int(int(results[row][5]) % NS)
+
+            try:
+                P, bit_always_flipping, Average_number_of_bit_flip = Faulty_entrances[
+                    str((x_, y_))
+                ]
                 P += 1
 
                 golden_float16 = Float16(results[row][6])
@@ -316,132 +398,166 @@ def Faulty_Entrances_Probabilities_masks(FID,sp,results):
                 faulty_bits = faulty_float16.bits
                 bit_flipped = golden_bits ^ faulty_bits
 
-                bit_always_flipping = bit_always_flipping & bit_flipped #in this way we only select bits thar are always flipping in that entrance in CTA
-                
-                bit = 0 #aka bit 0
-                while(bit < 16):
-                    mask_float16 = Float16(pow(2,int(bit)))
+                bit_always_flipping = (
+                    bit_always_flipping & bit_flipped
+                )  # in this way we only select bits thar are always flipping in that entrance in CTA
+
+                bit = 0  # aka bit 0
+                while bit < 16:
+                    mask_float16 = Float16(pow(2, int(bit)))
                     mask = mask_float16.bits
-                    if(mask & bit_flipped != 0):
+                    if mask & bit_flipped != 0:
                         Average_number_of_bit_flip += 1
                     bit += 1
 
-                Faulty_entrances[str((x_,y_))] = (P, bit_always_flipping, Average_number_of_bit_flip)
-            
+                Faulty_entrances[str((x_, y_))] = (
+                    P,
+                    bit_always_flipping,
+                    Average_number_of_bit_flip,
+                )
+
             except KeyError:
                 golden_float16 = Float16(results[row][6])
                 faulty_float16 = Float16(results[row][8])
                 golden_bits = golden_float16.bits
                 faulty_bits = faulty_float16.bits
                 bit_flipped = golden_bits ^ faulty_bits
-                
-                bit = 0 #aka bit 0
+
+                bit = 0  # aka bit 0
                 Average_number_of_bit_flip = 0
-                while(bit < 16):
-                    mask_float16 = Float16(pow(2,int(bit)))
+                while bit < 16:
+                    mask_float16 = Float16(pow(2, int(bit)))
                     mask = mask_float16.bits
-                    if(mask & bit_flipped != 0):
+                    if mask & bit_flipped != 0:
                         Average_number_of_bit_flip += 1
                     bit += 1
 
-                Faulty_entrances.update({str((x_,y_)) : (1, bit_flipped, Average_number_of_bit_flip)})
-    
-    
+                Faulty_entrances.update(
+                    {str((x_, y_)): (1, bit_flipped, Average_number_of_bit_flip)}
+                )
+
     for entrance in Faulty_entrances:
-        P,mask,Average_number_of_bit_flip = Faulty_entrances[entrance]
-        if P == 1 :
-            mask = None #is useless to store bits that are always flipping if entrance has been curropted only once
-            P = P*100/ number_of_faulty_CTAs(str(results[row][0]), int(results[0][1]), int(results[0][2]))#Target Cluster and SM are always the same
-            Faulty_entrances[entrance] = (P,mask, Average_number_of_bit_flip)
+        P, mask, Average_number_of_bit_flip = Faulty_entrances[entrance]
+        if P == 1:
+            mask = None  # is useless to store bits that are always flipping if entrance has been curropted only once
+            P = (
+                P
+                * 100
+                / number_of_faulty_CTAs(
+                    str(results[row][0]), int(results[0][1]), int(results[0][2])
+                )
+            )  # Target Cluster and SM are always the same
+            Faulty_entrances[entrance] = (P, mask, Average_number_of_bit_flip)
         else:
-            try :
-                Average_number_of_bit_flip /= P 
-            except ZeroDivisionError :
+            try:
+                Average_number_of_bit_flip /= P
+            except ZeroDivisionError:
                 Average_number_of_bit_flip = 0
-            P = P*100/ number_of_faulty_CTAs(str(results[row][0]), int(results[0][1]), int(results[0][2]))
-            Faulty_entrances[entrance] = (P,hex(mask), Average_number_of_bit_flip)
-        
+            P = (
+                P
+                * 100
+                / number_of_faulty_CTAs(
+                    str(results[row][0]), int(results[0][1]), int(results[0][2])
+                )
+            )
+            Faulty_entrances[entrance] = (P, hex(mask), Average_number_of_bit_flip)
+
     return Faulty_entrances
 
 
-def fault_info_extrapolation(fault_id, sp,results):
-    
-    if(format_type == 'float16'):
+def fault_info_extrapolation(fault_id, sp, results):
+    if format_type == "float16":
         fault_error_model = {
-            'FaultID': fault_id,
-            'Scheduler': sp,
-            'MeanRelativeError(%)': None,
-            'AverageAbsoluteError': None,# faulty - golden
-            'Discrepancy_Avg_against_golden_avg': None,
-            'Discrepancy_Std_against_golden_std': None,#these 2 parameters might be used for fault detection
-            'BitFlipProbabilities': {
-                'P(bit15)': 0.0,
-                'P(bit14)': 0.0,
-                'P(bit13)': 0.0,
-                'P(bit12)': 0.0,
-                'P(bit11)': 0.0,
-                'P(bit10)': 0.0,
-                'P(bit9)': 0.0,
-                'P(bit8)': 0.0,
-                'P(bit7)': 0.0,
-                'P(bit6)': 0.0,
-                'P(bit5)': 0.0,
-                'P(bit4)': 0.0,
-                'P(bit3)': 0.0,
-                'P(bit2)': 0.0,
-                'P(bit1)': 0.0,
-                'P(bit0)': 0.0
-
+            "FaultID": fault_id,
+            "Scheduler": sp,
+            "MeanRelativeError(%)": None,
+            "AverageAbsoluteError": None,  # faulty - golden
+            "Discrepancy_Avg_against_golden_avg": None,
+            "Discrepancy_Std_against_golden_std": None,  # these 2 parameters might be used for fault detection
+            "BitFlipProbabilities": {
+                "P(bit15)": 0.0,
+                "P(bit14)": 0.0,
+                "P(bit13)": 0.0,
+                "P(bit12)": 0.0,
+                "P(bit11)": 0.0,
+                "P(bit10)": 0.0,
+                "P(bit9)": 0.0,
+                "P(bit8)": 0.0,
+                "P(bit7)": 0.0,
+                "P(bit6)": 0.0,
+                "P(bit5)": 0.0,
+                "P(bit4)": 0.0,
+                "P(bit3)": 0.0,
+                "P(bit2)": 0.0,
+                "P(bit1)": 0.0,
+                "P(bit0)": 0.0,
             },
-            'FaultyEntrancesCTA': dict()#this is a dictionary with key (x,y) : (Probability of curroption of that entrance, Mask to apply, Average number of bit flip)
-                                         # X , Y are inegered between Ms, Ns --> if CTA is associated to faulty HW which are the entrances of to curropt
-                                         # Mask to apply is usually set to 'None' and probabilities of bit flip are explited to curropt data in 
-                                         # injector model but if  particular bit flips are always occuring a mask is provided   
-                                         # Average number of bit flip is going to be explited to generate the mask using both always flipping bits and 
-                                         # randomly generated bits to flip according to probability of bit flip
+            "FaultyEntrancesCTA": dict()  # this is a dictionary with key (x,y) : (Probability of curroption of that entrance, Mask to apply, Average number of bit flip)
+            # X , Y are inegered between Ms, Ns --> if CTA is associated to faulty HW which are the entrances of to curropt
+            # Mask to apply is usually set to 'None' and probabilities of bit flip are explited to curropt data in
+            # injector model but if  particular bit flips are always occuring a mask is provided
+            # Average number of bit flip is going to be explited to generate the mask using both always flipping bits and
+            # randomly generated bits to flip according to probability of bit flip
         }
-        fault_error_model['MeanRelativeError(%)'] = MeanRelativeError(fault_id, sp, results)
-        fault_error_model['AverageAbsoluteError'] = Average_absolute_Error(fault_id,sp,results)
+        fault_error_model["MeanRelativeError(%)"] = MeanRelativeError(
+            fault_id, sp, results
+        )
+        fault_error_model["AverageAbsoluteError"] = Average_absolute_Error(
+            fault_id, sp, results
+        )
 
-        d = read_matrix('d')
-        fault_error_model['Discrepancy_Std_against_golden_std'],fault_error_model['Discrepancy_Avg_against_golden_avg'] = Discrepancies_due_to_fault_injection(fault_id,sp,results,d)
+        d = read_matrix("d")
+        (
+            fault_error_model["Discrepancy_Std_against_golden_std"],
+            fault_error_model["Discrepancy_Avg_against_golden_avg"],
+        ) = Discrepancies_due_to_fault_injection(fault_id, sp, results, d)
 
-        bit_flip_probabilities = Bit_flip_probability_Format_Float16(fault_id,sp,results)
+        bit_flip_probabilities = Bit_flip_probability_Format_Float16(
+            fault_id, sp, results
+        )
         for bit in range(len(bit_flip_probabilities)):
-            fault_error_model['BitFlipProbabilities']['P(bit'+str(bit)+')'] = bit_flip_probabilities[bit]
+            fault_error_model["BitFlipProbabilities"][
+                "P(bit" + str(bit) + ")"
+            ] = bit_flip_probabilities[bit]
 
-        fault_error_model['FaultyEntrancesCTA'] = Faulty_Entrances_Probabilities_masks(fault_id,sp,results)
+        fault_error_model["FaultyEntrancesCTA"] = Faulty_Entrances_Probabilities_masks(
+            fault_id, sp, results
+        )
         return fault_error_model
     else:
-        logger.warning('Not supported data format please change it in default.yalm')
+        logger.warning("Not supported data format please change it in default.yalm")
         sys.exit()
 
 
-
 def validator(x, y):
-    results_path = os.path.join(os.getcwd(), 'FaultInjector', 'results.csv')
+    results_path = os.path.join(os.getcwd(), "FaultInjector", "results.csv")
     results = read_results(results_path)
-    heat_maps(results,x,y)
+    heat_maps(results, x, y)
 
-
-    #Now I extrapolate and store all the informations required for error modelling of fault injections
-    os.chdir('FaultInjector')
+    # Now I extrapolate and store all the informations required for error modelling of fault injections
+    os.chdir("FaultInjector")
     try:
-        os.mkdir('ErrorModel')
+        os.mkdir("ErrorModel")
     except:
-        logger.warning("Failed to create ErrorModel repo, already exists, resuming execution")
-    os.chdir('../')
-    
+        logger.warning(
+            "Failed to create ErrorModel repo, already exists, resuming execution"
+        )
+    os.chdir("../")
+
     faults = read_fault_list()
     Faults_Error_Model_List = []
     for f in range(len(faults)):
-        Faults_Error_Model_List.append(fault_info_extrapolation(int(faults[f][3]),str(faults[f][0]),results) )
+        Faults_Error_Model_List.append(
+            fault_info_extrapolation(int(faults[f][3]), str(faults[f][0]), results)
+        )
 
-    path = os.path.join(os.getcwd(), 'FaultInjector', 'ErrorModel', 'FaultsErrorModel.json')
-    write_Json(Faults_Error_Model_List,path)
-    path = os.path.join(os.getcwd(), 'FaultInjector', 'ErrorModel', 'FaultsErrorModel.csv')
-    write_csv(Faults_Error_Model_List,path)
+    path = os.path.join(
+        os.getcwd(), "FaultInjector", "ErrorModel", "FaultsErrorModel.json"
+    )
+    write_Json(Faults_Error_Model_List, path)
+    path = os.path.join(
+        os.getcwd(), "FaultInjector", "ErrorModel", "FaultsErrorModel.csv"
+    )
+    write_csv(Faults_Error_Model_List, path)
 
-    logger.warning('Validator module completed')
-
-    
+    logger.warning("Validator module completed")

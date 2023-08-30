@@ -2,7 +2,7 @@ from utils.args import args
 
 
 from .models import Scheduler
-from .utils import complete, save_csv,save_json
+from .utils import complete, save_csv, save_json
 
 
 MS = args.mxm.MS
@@ -137,8 +137,8 @@ class GlobalRoundRobin(Scheduler.Scheduler):
                     "SM": SM_id,
                     "CTA": {
                         "id": CTA_id,
-                        "x":  new_row_c_start,
-                        "y":  new_column_c_start,
+                        "x": new_row_c_start,
+                        "y": new_column_c_start,
                     },
                 }
                 CTA_id += 1
@@ -146,6 +146,6 @@ class GlobalRoundRobin(Scheduler.Scheduler):
 
     def __create_dict(self, CTA_info):
         self.__scheduler_info.append(CTA_info)
-    
+
     def read_name(self):
         return self._name

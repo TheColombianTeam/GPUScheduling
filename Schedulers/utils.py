@@ -34,9 +34,9 @@ def save_csv(scheduler_info, filename):
         writer.writerow(row)
     file_ptr.close()
 
+
 def save_json(scheduler_info, filename):
     file_path = os.path.join(os.getcwd(), "Schedulers", "scheduled", f"{filename}.json")
     with open(file_path, "w+") as JSONfile:
-            json.dump(scheduler_info,JSONfile)        
+        json.dump(scheduler_info, JSONfile)
     JSONfile.close()
-    

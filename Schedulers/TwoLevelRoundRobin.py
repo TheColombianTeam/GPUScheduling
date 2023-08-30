@@ -136,7 +136,7 @@ class TwoLevelRoundRobin(Scheduler.Scheduler):
                     "SM": SM_id,
                     "CTA": {
                         "id": CTA_id,
-                        "x":  new_row_c_start,
+                        "x": new_row_c_start,
                         "y": new_column_c_start,
                     },
                 }
@@ -145,6 +145,6 @@ class TwoLevelRoundRobin(Scheduler.Scheduler):
 
     def __create_dict(self, CTA_info):
         self.__scheduler_info.append(CTA_info)
-    
+
     def read_name(self):
         return self._name
