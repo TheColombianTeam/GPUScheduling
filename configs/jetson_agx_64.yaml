@@ -1,0 +1,6 @@
+name: jetson_agx_64 # name of the experiment needed for the logs
+
+gpu:
+  sm: 8
+  cluster: 2
+  CTAs_buffer: 1
