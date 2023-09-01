@@ -13,7 +13,7 @@ from log.logger import logger
 
 MS = args.mxm.MS
 NS = args.mxm.NS
-format_type = str(args.config.format)
+
 
 
 def write_Json(Models, path):
@@ -466,67 +466,64 @@ def Faulty_Entrances_Probabilities_masks(FID, sp, results):
 
 
 def fault_info_extrapolation(fault_id, sp, results):
-    if format_type == "float16":
-        fault_error_model = {
-            "FaultID": fault_id,
-            "Scheduler": sp,
-            "MeanRelativeError(%)": None,
-            "AverageAbsoluteError": None,  # faulty - golden
-            "Discrepancy_Avg_against_golden_avg": None,
-            "Discrepancy_Std_against_golden_std": None,  # these 2 parameters might be used for fault detection
-            "BitFlipProbabilities": {
-                "P(bit15)": 0.0,
-                "P(bit14)": 0.0,
-                "P(bit13)": 0.0,
-                "P(bit12)": 0.0,
-                "P(bit11)": 0.0,
-                "P(bit10)": 0.0,
-                "P(bit9)": 0.0,
-                "P(bit8)": 0.0,
-                "P(bit7)": 0.0,
-                "P(bit6)": 0.0,
-                "P(bit5)": 0.0,
-                "P(bit4)": 0.0,
-                "P(bit3)": 0.0,
-                "P(bit2)": 0.0,
-                "P(bit1)": 0.0,
-                "P(bit0)": 0.0,
-            },
-            "FaultyEntrancesCTA": dict()  # this is a dictionary with key (x,y) : (Probability of curroption of that entrance, Mask to apply, Average number of bit flip)
+    fault_error_model = {
+        "FaultID": fault_id,
+        "Scheduler": sp,
+        "MeanRelativeError(%)": None,
+        "AverageAbsoluteError": None,  # faulty - golden
+        "Discrepancy_Avg_against_golden_avg": None,
+        "Discrepancy_Std_against_golden_std": None,  # these 2 parameters might be used for fault detection
+        "BitFlipProbabilities": {
+            "P(bit15)": 0.0,
+            "P(bit14)": 0.0,
+            "P(bit13)": 0.0,
+            "P(bit12)": 0.0,
+            "P(bit11)": 0.0,
+            "P(bit10)": 0.0,
+            "P(bit9)": 0.0,
+            "P(bit8)": 0.0,
+            "P(bit7)": 0.0,
+            "P(bit6)": 0.0,
+            "P(bit5)": 0.0,
+            "P(bit4)": 0.0,
+            "P(bit3)": 0.0,
+            "P(bit2)": 0.0,
+            "P(bit1)": 0.0,
+            "P(bit0)": 0.0,
+        },
+        "FaultyEntrancesCTA": dict()  # this is a dictionary with key (x,y) : (Probability of curroption of that entrance, Mask to apply, Average number of bit flip)
             # X , Y are inegered between Ms, Ns --> if CTA is associated to faulty HW which are the entrances of to curropt
             # Mask to apply is usually set to 'None' and probabilities of bit flip are explited to curropt data in
             # injector model but if  particular bit flips are always occuring a mask is provided
             # Average number of bit flip is going to be explited to generate the mask using both always flipping bits and
             # randomly generated bits to flip according to probability of bit flip
-        }
-        fault_error_model["MeanRelativeError(%)"] = MeanRelativeError(
-            fault_id, sp, results
-        )
-        fault_error_model["AverageAbsoluteError"] = Average_absolute_Error(
-            fault_id, sp, results
-        )
+    }
+    fault_error_model["MeanRelativeError(%)"] = MeanRelativeError(
+        fault_id, sp, results
+    )
+    fault_error_model["AverageAbsoluteError"] = Average_absolute_Error(
+        fault_id, sp, results
+    )
 
-        d = read_matrix("d")
-        (
-            fault_error_model["Discrepancy_Std_against_golden_std"],
-            fault_error_model["Discrepancy_Avg_against_golden_avg"],
-        ) = Discrepancies_due_to_fault_injection(fault_id, sp, results, d)
+    d = read_matrix("d")
+    (
+        fault_error_model["Discrepancy_Std_against_golden_std"],
+        fault_error_model["Discrepancy_Avg_against_golden_avg"],
+    ) = Discrepancies_due_to_fault_injection(fault_id, sp, results, d)
 
-        bit_flip_probabilities = Bit_flip_probability_Format_Float16(
-            fault_id, sp, results
-        )
-        for bit in range(len(bit_flip_probabilities)):
-            fault_error_model["BitFlipProbabilities"][
-                "P(bit" + str(bit) + ")"
-            ] = bit_flip_probabilities[bit]
+    bit_flip_probabilities = Bit_flip_probability_Format_Float16(
+        fault_id, sp, results
+    )
+    for bit in range(len(bit_flip_probabilities)):
+        fault_error_model["BitFlipProbabilities"][
+            "P(bit" + str(bit) + ")"
+        ] = bit_flip_probabilities[bit]
 
-        fault_error_model["FaultyEntrancesCTA"] = Faulty_Entrances_Probabilities_masks(
-            fault_id, sp, results
-        )
-        return fault_error_model
-    else:
-        logger.warning("Not supported data format please change it in default.yalm")
-        sys.exit()
+    fault_error_model["FaultyEntrancesCTA"] = Faulty_Entrances_Probabilities_masks(
+        fault_id, sp, results
+    )
+    return fault_error_model
+
 
 
 def validator(x, y):

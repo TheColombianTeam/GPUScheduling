@@ -9,7 +9,7 @@ format_type = str(args.config.format)
 
 
 def corrupted_etrances_extrapolation(d, d_golden):
-    global format_type
+    
 
     faulty_entrances = []
     faulty_values = []
@@ -24,16 +24,15 @@ def corrupted_etrances_extrapolation(d, d_golden):
                 faulty_values.append(d[row][column])
                 golden_falty_values.append(golden)
 
-                if format_type == "float16":
-                    golden_format = Float16(golden)
-                    faulty_format = Float16(d[row][column])
-                    bits_golden = golden_format.bits
-                    bits_faulty = faulty_format.bits
-                    golden_faulty_hex.append(hex(bits_golden))
-                    faulty_hex.append(hex(bits_faulty))
-                else:
-                    print("Not implemented data fromat, dying")
-                    sys.exit()
+                golden_format = Float16(golden)
+                faulty_format = Float16(d[row][column])
+                bits_golden = golden_format.bits
+                bits_faulty = faulty_format.bits
+                golden_faulty_hex.append(hex(bits_golden))
+                faulty_hex.append(hex(bits_faulty))
+                
+                    
+                    
 
     return (
         faulty_entrances[:],
