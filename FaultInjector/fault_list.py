@@ -43,4 +43,4 @@ def fault_list(faulty_SM=0, faulty_cluster=0):
     save_fault_list(file_ptr, FIDs, faulty_SM, faulty_cluster)
     file_ptr.close()
 
-    logger.waring("Fault list module completed")
+    logger.warning("Fault list module completed")
