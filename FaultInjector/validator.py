@@ -51,10 +51,13 @@ def write_csv(Models, path):
         "Bit 13 Flip Probability",
         "Bit 14 Flip Probability",
         "Bit 15 Flip Probability",
+        'Probability of Exponent Corruption',
         "Entrance",
         "Probability of entrance curroption(%)",
         "Mask",
-        "Average number of bit flip",
+        "Average Mantissa Bit Flip --> Golden Exponent",
+        'Average Bit Flip Exponent ',
+        "Average Mantissa Bit Flip --> Faulty Golden",
         "Ripetition...",
     ]
 
@@ -83,13 +86,18 @@ def write_csv(Models, path):
         row.append(Models[fault]["BitFlipProbabilities"]["P(bit13)"])
         row.append(Models[fault]["BitFlipProbabilities"]["P(bit14)"])
         row.append(Models[fault]["BitFlipProbabilities"]["P(bit15)"])
+        row.append(Models[fault]['ProbabilityExpCorruption'])
 
         for entrance in Models[fault]["FaultyEntrancesCTA"]:
             row.append(entrance)
-            P, mask, avg = Models[fault]["FaultyEntrancesCTA"][entrance]
+            P, bit_always_flipping, AvgMantissaBitFlipExpRight, AvgBitFlipExp, AvgMantissaBitFlipExpWrong = Models[fault]["FaultyEntrancesCTA"][entrance]
             row.append(P)
-            row.append(mask)
-            row.append(avg)
+            row.append(bit_always_flipping)
+            row.append(AvgMantissaBitFlipExpRight)
+            row.append(AvgBitFlipExp)
+            row.append(AvgMantissaBitFlipExpWrong)
+            
+
         writer.writerow(row)
 
     file_ptr.close()
@@ -343,6 +351,9 @@ def Discrepancies_due_to_fault_injection(FID, sp, results, d_golden):
 
 
 def Bit_flip_probability_Format_Float16(FID, sp, results):
+    
+    NumberEntrancesCorrupted = 0
+    NumberEntrancesExpCorrupted = 0
     Bit_flip_occurrences = []
     for bit in range(16):
         Bit_flip_occurrences.append(0)
@@ -356,12 +367,18 @@ def Bit_flip_probability_Format_Float16(FID, sp, results):
 
             bit_flipped = golden_bits ^ faulty_bits
             bit = 0  # aka bit 0
+            corrupted_exp = False
             while bit < 16:
                 mask_float16 = Float16(pow(2, int(bit)))
                 mask = mask_float16.bits
                 if mask & bit_flipped != 0:
                     Bit_flip_occurrences[bit] += 1
+                    if  9 < bit < 15 :
+                        corrupted_exp = True
                 bit += 1
+            if corrupted_exp :
+                NumberEntrancesExpCorrupted += 1
+            NumberEntrancesCorrupted += 1
 
     all_bit_flips = sum(Bit_flip_occurrences)
     for bit in range(16):  # calculate P(%) of bit flip for each bit
@@ -369,16 +386,17 @@ def Bit_flip_probability_Format_Float16(FID, sp, results):
             Bit_flip_occurrences[bit] = Bit_flip_occurrences[bit] * 100 / all_bit_flips
 
         except ZeroDivisionError as e:
-            logger.warning(
-                " Error division by zero in bit flip probabilities, returning all zero probabilities"
-            )
-            return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            #logger.warning(
+            #    " Error division by zero in bit flip probabilities, returning all zero probabilities"
+            #)
+            return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0.0
 
-    return Bit_flip_occurrences[:]
+    return Bit_flip_occurrences[:], float(NumberEntrancesExpCorrupted*100/NumberEntrancesCorrupted)
 
 
 def Faulty_Entrances_Probabilities_masks(FID, sp, results):
     Faulty_entrances = dict()
+
     for row in range(len(results)):
         if FID == int(results[row][3]) and sp == str(results[row][0]):
             x_ = int(
@@ -386,8 +404,9 @@ def Faulty_Entrances_Probabilities_masks(FID, sp, results):
             )  # to find absolute position of fault propagation in CTA
             y_ = int(int(results[row][5]) % NS)
 
+
             try:
-                P, bit_always_flipping, Average_number_of_bit_flip = Faulty_entrances[
+                P, bit_always_flipping, AvgMantissaBitFlipExpRight, AvgBitFlipExp, AvgMantissaBitFlipExpWrong, ExpCurroptionCounter = Faulty_entrances[
                     str((x_, y_))
                 ]
                 P += 1
@@ -402,18 +421,31 @@ def Faulty_Entrances_Probabilities_masks(FID, sp, results):
                     bit_always_flipping & bit_flipped
                 )  # in this way we only select bits thar are always flipping in that entrance in CTA
 
-                bit = 0  # aka bit 0
-                while bit < 16:
+                bit = 15  # aka bit 0
+                ExpCorrupted = False
+                while bit >= 0:
                     mask_float16 = Float16(pow(2, int(bit)))
                     mask = mask_float16.bits
                     if mask & bit_flipped != 0:
-                        Average_number_of_bit_flip += 1
-                    bit += 1
+                        if 9 < bit < 15 :
+                            AvgBitFlipExp += 1
+                            ExpCorrupted = True
+                        elif ExpCorrupted: #Mantissa bit flip in a mask with corrupted exponent
+                            AvgMantissaBitFlipExpWrong += 1
+                        else : #Mantissa bit flip in a mask were exponent was rigth
+                            AvgMantissaBitFlipExpRight += 1
+                    bit -= 1
+
+                if ExpCorrupted :
+                    ExpCurroptionCounter += 1
 
                 Faulty_entrances[str((x_, y_))] = (
                     P,
                     bit_always_flipping,
-                    Average_number_of_bit_flip,
+                    AvgMantissaBitFlipExpRight,
+                    AvgBitFlipExp,
+                    AvgMantissaBitFlipExpWrong,
+                    ExpCurroptionCounter
                 )
 
             except KeyError:
@@ -423,21 +455,35 @@ def Faulty_Entrances_Probabilities_masks(FID, sp, results):
                 faulty_bits = faulty_float16.bits
                 bit_flipped = golden_bits ^ faulty_bits
 
-                bit = 0  # aka bit 0
-                Average_number_of_bit_flip = 0
-                while bit < 16:
+                bit = 15 # aka bit 0
+                AvgMantissaBitFlipExpRight = 0
+                AvgMantissaBitFlipExpWrong = 0
+                AvgBitFlipExp = 0
+                ExpCurroptionCounter = 0
+
+                ExpCorrupted = False
+                while bit >= 0:
                     mask_float16 = Float16(pow(2, int(bit)))
                     mask = mask_float16.bits
                     if mask & bit_flipped != 0:
-                        Average_number_of_bit_flip += 1
-                    bit += 1
+                        if 9 < bit < 15 :
+                            AvgBitFlipExp += 1
+                            ExpCorrupted = True
+                        elif ExpCorrupted : # Mantissa bit flip in a mask were exponent was corrupted
+                            AvgMantissaBitFlipExpWrong += 1
+                        else: #Mantissa bit flip in a mask were exponent was correct
+                            AvgMantissaBitFlipExpRight += 1
+                    bit -= 1
+                
+                if ExpCorrupted :
+                    ExpCurroptionCounter += 1
 
                 Faulty_entrances.update(
-                    {str((x_, y_)): (1, bit_flipped, Average_number_of_bit_flip)}
+                    {str((x_, y_)): (1, bit_flipped, AvgMantissaBitFlipExpRight, AvgBitFlipExp, AvgMantissaBitFlipExpWrong,ExpCurroptionCounter)}
                 )
 
     for entrance in Faulty_entrances:
-        P, mask, Average_number_of_bit_flip = Faulty_entrances[entrance]
+        P, mask, AvgMantissaBitFlipExpRight, AvgBitFlipExp , AvgMantissaBitFlipExpWrong, ExpCurroptionCounter = Faulty_entrances[entrance]
         if P == 1:
             mask = None  # is useless to store bits that are always flipping if entrance has been curropted only once
             P = (
@@ -447,20 +493,32 @@ def Faulty_Entrances_Probabilities_masks(FID, sp, results):
                     str(results[row][0]), int(results[0][1]), int(results[0][2])
                 )
             )  # Target Cluster and SM are always the same
-            Faulty_entrances[entrance] = (P, mask, Average_number_of_bit_flip)
+
+
+            Faulty_entrances[entrance] = (P, mask, AvgMantissaBitFlipExpRight, AvgBitFlipExp, AvgMantissaBitFlipExpWrong)# accomulators are directly average since P = 1
         else:
+            TimesExpoRight = P - ExpCurroptionCounter
             try:
-                Average_number_of_bit_flip /= P
+                AvgMantissaBitFlipExpRight = AvgMantissaBitFlipExpRight/TimesExpoRight
             except ZeroDivisionError:
-                Average_number_of_bit_flip = 0
+                AvgMantissaBitFlipExpRight = 0.0
+            
+            try:
+                AvgBitFlipExp = AvgBitFlipExp/ExpCurroptionCounter
+                AvgMantissaBitFlipExpWrong = AvgMantissaBitFlipExpWrong/ExpCurroptionCounter
+            except ZeroDivisionError:
+                AvgBitFlipExp = 0.0
+                AvgMantissaBitFlipExpWrong = 0.0
+
             P = (
                 P
                 * 100
                 / number_of_faulty_CTAs(
                     str(results[row][0]), int(results[0][1]), int(results[0][2])
                 )
-            )
-            Faulty_entrances[entrance] = (P, hex(mask), Average_number_of_bit_flip)
+            )#calculating probability of spatial propagation in faukty CTA
+
+            Faulty_entrances[entrance] = (P, hex(mask), AvgMantissaBitFlipExpRight, AvgBitFlipExp, AvgMantissaBitFlipExpWrong)
 
     return Faulty_entrances
 
@@ -491,12 +549,16 @@ def fault_info_extrapolation(fault_id, sp, results):
             "P(bit1)": 0.0,
             "P(bit0)": 0.0,
         },
-        "FaultyEntrancesCTA": dict()  # this is a dictionary with key (x,y) : (Probability of curroption of that entrance, Mask to apply, Average number of bit flip)
+        'ProbabilityExpCorruption': 0.0,
+        "FaultyEntrancesCTA": dict()  # this is a dictionary with key (x,y) : (Probability of curroption of that entrance, Mask to apply, Average number of bit flip Mantissa Exp Right, AvgBitFlipExponent, AvgBitFlipMantissaIfExponentCorrupted)
             # X , Y are inegered between Ms, Ns --> if CTA is associated to faulty HW which are the entrances of to curropt
             # Mask to apply is usually set to 'None' and probabilities of bit flip are explited to curropt data in
             # injector model but if  particular bit flips are always occuring a mask is provided
-            # Average number of bit flip is going to be explited to generate the mask using both always flipping bits and
-            # randomly generated bits to flip according to probability of bit flip
+            # To generate the mask i will also need:
+            #Average number of bit flip in Mantissa when exponent right --> mask size if according Probability ExpCorruption a mask with no bit flip in exponent is produced  
+            # --> If according to 'ProbabilityExpCorruption' a mask with bit flips in exponent is needed:
+            # Avg Bit Flip in Exponent will be generated according to bit flip probabilites of exponent
+            # Avg Bit Fip Mantissa if exponent is wrong will be used to generate mask in mantissa 
     }
     fault_error_model["MeanRelativeError(%)"] = MeanRelativeError(
         fault_id, sp, results
@@ -511,7 +573,7 @@ def fault_info_extrapolation(fault_id, sp, results):
         fault_error_model["Discrepancy_Avg_against_golden_avg"],
     ) = Discrepancies_due_to_fault_injection(fault_id, sp, results, d)
 
-    bit_flip_probabilities = Bit_flip_probability_Format_Float16(
+    bit_flip_probabilities, fault_error_model["ProbabilityExpCorruption"] = Bit_flip_probability_Format_Float16(
         fault_id, sp, results
     )
     for bit in range(len(bit_flip_probabilities)):

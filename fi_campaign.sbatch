@@ -28,5 +28,6 @@ do
         cp $dir/FaultInjector/HeatMaps/* $dir/results/$config
         cp $dir/FaultInjector/results.csv $dir/results/$config
         cp $dir/FaultInjector/ErrorModel/*  $dir/results/$config
+        cp $dir/Schedulers/scheduled/*  $dir/results/$config
     fi
 done
