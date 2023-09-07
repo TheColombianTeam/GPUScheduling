@@ -7,7 +7,7 @@ from ErrorInjector import ErrorInjector
 from ErrorInjector import Modellor
 
 import os,csv, sys
-import random
+import random, time
 
 from log.logger import logger
 
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     Modellor_dcta = Modellor('DistributedCTA',imported=False,update=True)
     Modellor_db = Modellor('DistributedBlock',imported=False,update=True)
 
-
+    st = time.time()
     test_passes = 0
     for fault in range(len(FaultList)):
         FID = FaultList[fault][3]
@@ -128,12 +128,15 @@ if __name__ == "__main__":
                 logger.warning('Max Error introduced by fault : ' + str(ErrorInjecto.MaxAbsError(RealInjections.numpy(),golden.numpy())))
 
                 n = 1
+                FasterErrInjct = ErrorInjector(FID,scheduler,'DummyGPU',imported=False,validation=False)#we already have TCU results --> I need only masks
                 while ( n < n_attempts):
-                    FasterErrInjct = ErrorInjector(FID,scheduler,'DummyGPU',imported=False,validation=False)#we already have TCU results --> I need only masks
                     Faulty = FasterErrInjct.FaultyMatrixMult(a,b)
                     if (0.1 < float(AvgError/FasterErrInjct.AvgAbsError(Faulty.numpy(),golden.numpy())) < 10 or 
-                                    AvgError == FasterErrInjct.AvgAbsError(Faulty.numpy(),golden.numpy()) == 0.0 ):
+                                    AvgError == FasterErrInjct.AvgAbsError(Faulty.numpy(),golden.numpy()) == 0.0 or
+                                         (str(AvgError) == 'inf' and FasterErrInjct.AvgAbsError(Faulty.numpy(),golden.numpy()) > 1000) or
+                                                (str(AvgError) == 'nan' and FasterErrInjct.AvgAbsError(Faulty.numpy(),golden.numpy()) > 1000)):
                         
+                        logger.warning('GENERATED MODEL FOR FAULT THAT FAILED TEST AFTHER ATTEMPTS:  '+str(n))
                         Modellor_ = FindModellor(scheduler,Modellor_2lrr,Modellor_grr, Modellor_greedy,Modellor_dcta,Modellor_db)
                         Masks = FasterErrInjct.MasksListToModellor() #list of dict( {(x,y) : 0x00ff})
                         associated = Modellor_.AssignFaultToModel(Masks,Avg_model_error,
@@ -149,8 +152,12 @@ if __name__ == "__main__":
                     
                     else:
                         n += 1
+                
+                if n == n_attempts:
+                    logger.warning('CANT GENERATE A MODEL FOR FAULT ID :'+str(FID) +' , schedulers irrilevant')
                         
-
+    end = time.time()
+    print('100 faults time :  '+str((end-st)/60)+ 'min')
     
     Modellor_2lrr.StoreModels()
     Modellor_grr.StoreModels()
@@ -158,7 +165,7 @@ if __name__ == "__main__":
     Modellor_dcta.StoreModels()
     Modellor_db.StoreModels()
     
-    logger.warning('Passed ' + str(test_passes*100/8000) + ' (%) of tests for 8k faults')
+    logger.warning('Passed ' + str(test_passes*100/15) + ' (%) of tests for 8k faults')
 
 
 
