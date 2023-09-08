@@ -26,6 +26,7 @@ class GlobalRoundRobin(Scheduler.Scheduler):
         )
 
     def scheduler_algorithm(self, a, b, c):
+        self.__scheduler_info = []
         self.__tiling(a, b, c)
 
         cluster_id = 0

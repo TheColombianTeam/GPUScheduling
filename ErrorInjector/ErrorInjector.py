@@ -17,7 +17,7 @@ faulty_Cluster = int(args.faults.faulty_Cluster)
 faulty_SM = int(args.faults.faulty_SM)
 
 class ErrorInjector():
-    def __init__(self,FaultID,Scheduler,GPU = 'combinedGPU',imported = True, validation = False): #Imported flag is telling the code if Scheduelrs env is introduced in bigger env
+    def __init__(self,FaultID,Scheduler,GPU = 'DummyGPU',imported = True, validation = False): #Imported flag is telling the code if Scheduelrs env is introduced in bigger env
         self._imported = imported                                                                # if Validation is true, returns max abs error of ErrorInjector with respcet to execution using PyOpenTCU
         self._validation  = validation
         self._ErrorModels = self.read_FaultsErrorModel(GPU)

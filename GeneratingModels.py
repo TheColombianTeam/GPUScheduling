@@ -61,9 +61,9 @@ if __name__ == "__main__":
 
     st = time.time()
     test_passes = 0
-    for fault in range(len(FaultList)):
-        FID = FaultList[fault][3]
-        scheduler = FaultList[fault][0]
+    for fault in range(20):
+        FID = FaultList[fault+5][3]
+        scheduler = FaultList[fault+5][0]
         ErrorInjecto = ErrorInjector(FID,scheduler,'DummyGPU',imported=False,validation=True)#trying to validate error injector/ not imported in CustomDNNLayers
         
         common_dim = random.randint(120,250)

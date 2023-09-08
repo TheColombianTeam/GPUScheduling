@@ -23,6 +23,7 @@ class DistributedCTA(Scheduler.Scheduler):
         )
 
     def scheduler_algorithm(self, a, b, c):
+        self.__scheduler_info = []
         self.__tiling(a, b, c)
         to_schedule_CTAs_per_cluster = []
         for c in range(self._n_clusters):
