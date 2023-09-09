@@ -41,8 +41,6 @@ def Plotting(x,y,scheduler):
 
 
 
-
-
 dimentions = 120
 faulty_SM = int(args.faults.faulty_SM)
 faulty_Cluster = int(args.faults.faulty_Cluster)
@@ -81,7 +79,7 @@ x_dcta = []
 y_dcta = []
 
 st = time.time()
-for fault in range(100000):
+for fault in range(1000):
     CTAs_2lrr = TwoLevelRoundRobinScheduler.scheduler_algorithm(a,b,c)
     CTAs_grr = GlobalRoundRobinScheduler.scheduler_algorithm(a,b,c)
     CTAs_greedy = GreedyScheduler.scheduler_algorithm(a,b,c)

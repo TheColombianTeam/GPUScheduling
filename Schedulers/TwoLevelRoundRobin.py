@@ -64,6 +64,9 @@ class TwoLevelRoundRobin(Scheduler.Scheduler):
                         cluster_id
                     ]
                     cluster_id += 1
+ 
+                    if cluster_id == self._n_clusters:
+                        cluster_id = 0
                 else:
                     to_schedule_CTAs_per_cluster[stocastic_ordering[cluster_id]].append(
                         CTA_id

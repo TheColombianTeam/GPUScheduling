@@ -68,6 +68,7 @@ class GlobalRoundRobin(Scheduler.Scheduler):
                         cluster_id
                     ]
                     sm_counter += 1
+                    
                 else:
                     to_schedule_CTAs_per_cluster[stocastic_ordering[cluster_id]].append(
                         CTA_id

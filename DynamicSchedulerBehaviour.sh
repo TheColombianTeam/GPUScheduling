@@ -16,3 +16,9 @@ do
         cp $dir/Schedulers/DynamicBehaviour/GlobalRoundRobin.png  $dir/Schedulers/DynamicBehaviour/$config
     fi
 done
+
+rm $dir/Schedulers/DynamicBehaviour/DistributedBlock.png
+rm $dir/Schedulers/DynamicBehaviour/DistributedCTA.png
+rm $dir/Schedulers/DynamicBehaviour/Greedy.png
+rm $dir/Schedulers/DynamicBehaviour/TwoLevelRoundRobin.png
+rm $dir/Schedulers/DynamicBehaviour/GlobalRoundRobin.png
