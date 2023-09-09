@@ -111,10 +111,6 @@ class Modellor(ErrorInjector,MaskInjector):
             self._Models[model]['MinAbsError'] = str(self._Models[model]['MinAbsError'])
             self._Models[model]['MaxAbsError'] = str(self._Models[model]['MaxAbsError'])
 
-            for CTA in range(len(self._Models[model]['Masks'])):
-                for coordinate in self._Models[model]['Masks'][CTA]:
-                    self._Models[model]['Masks'][CTA][coordinate] = hex(self._Models[model]['Masks'][CTA][coordinate].bits)
-
         if self._imported:
             path = os.path.join(os.getcwd(),'Schedulers', 'ErrorInjector','Models', str(self._Scheduler)+'.json')
         else:

@@ -2,3 +2,4 @@ gpu:
   sm: 2
   cluster: 1
   CTAs_buffer: 1
+  name: 'jetson_tx2'
