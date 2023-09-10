@@ -46,11 +46,11 @@ class Modellor(ErrorInjector,MaskInjector):
                     print('Wrong Model ID')
                     sys.exit()
 
-                for coordinate in Masks[int(CTA % len(Masks))] :  #Masks is a list of dictionary {str(x,y) : Mask}
+                for coordinate in Masks[int(CTA['CTA']['id'] % len(Masks))] :  #Masks is a list of dictionary {str(x,y) : Mask}
                     _x , _y = eval(coordinate)
                     try :
                         Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ] = self.MaskInjection.ApplyMask( self, 
-                                        Float16(Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ]), Masks[int(CTA % len(Masks))][coordinate])
+                                        Float16(Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ]), Masks[int(CTA['CTA']['id'] % len(Masks))][coordinate])
 
                     except: #This is an excpetion raised since curropting an entrance introduced by zero padding that is removed later
                         #print('Excpetion')
