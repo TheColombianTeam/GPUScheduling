@@ -6,13 +6,13 @@
 #SBATCH --time=240:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=32
-#SBATCH --output=/home/fpessia/Schedulers/ErrorInjector/Modellor_terminal.txt
+#SBATCH --output=/home/fpessia/SCHEDULERS_LINUX/ErrorInjector/Modellor_terminal.txt
 
 
 cd ../
 source /home/fpessia/Python/bin/activate
 echo "Python env setted"
-cd Schedulers
+cd SCHEDULERS_LINUX
 
 
 dir=`pwd`

@@ -38,6 +38,7 @@ class Modellor(ErrorInjector,MaskInjector):
         Faulty_np = golden_torch.numpy().copy()
         self.AllocateCTA(a.numpy(),b.numpy(),Faulty_np)
 
+        mask_id = 0
         for CTA in self._CTAs : 
             if CTA['Cluster'] == faulty_Cluster and CTA['SM'] == faulty_SM :
                 try:
@@ -46,15 +47,16 @@ class Modellor(ErrorInjector,MaskInjector):
                     print('Wrong Model ID')
                     sys.exit()
 
-                for coordinate in Masks[int(CTA['CTA']['id'] % len(Masks))] :  #Masks is a list of dictionary {str(x,y) : Mask}
+                for coordinate in Masks[int(mask_id % len(Masks))] :  #Masks is a list of dictionary {str(x,y) : Mask}
                     _x , _y = eval(coordinate)
                     try :
                         Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ] = self.MaskInjection.ApplyMask( self, 
-                                        Float16(Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ]), Masks[int(CTA['CTA']['id'] % len(Masks))][coordinate])
+                                        Float16(Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ]), Masks[int(mask_id % len(Masks))][coordinate])
 
                     except: #This is an excpetion raised since curropting an entrance introduced by zero padding that is removed later
-                        #print('Excpetion')
+                        
                         pass
+                mask_id += 1
         return torch.from_numpy(Faulty_np)
 
     def AssignFaultToModel(self,Masks,AvgAbsError,MaxAbsError,MinAbsError, FaultID):
