@@ -15,8 +15,7 @@ import multiprocessing as mp
 from sfpy import *
 
 
-n_attempts = 5 #these are the number of time masks will be tempted to be created before classifing faults as impossible to be modelled
-UnModellableFaults = []
+n_attempts = 8 #these are the number of time masks will be tempted to be created before classifing faults as impossible to be modelled
 Lock = mp.Lock()
 
 def read_fault_list():
@@ -85,12 +84,11 @@ def EvaluateAndAssignModel(Shared_Models_Queue):
                                                       FID)
             if not(associated): #then i have to create a brand new model for this fault
                 Modellor_.AddModel(FID,Masks,AvgAbsErr,
-                                   MinAbsErr,
-                                   MaxAbsErr)
+                                   MaxAbsErr,
+                                   MinAbsErr)
             
-def GenerateModel(FID,scheduler,Shared_Models_Queue):
-    global n_attempts
-    global UnModellableFaults
+def GenerateModel(FID,scheduler,UnModellableFaults,Shared_Models_Queue):
+    n_attempts = 8
     global Lock
 
     common_dim = random.randint(120,250)
@@ -172,14 +170,14 @@ def GenerateModel(FID,scheduler,Shared_Models_Queue):
                     )
                     Lock.release()
 
-def storeUnModellableFaults():
-    global UnModellableFaults
+def storeUnModellableFaults(UnModellableFaults):
     path = os.path.join(os.getcwd(),'ErrorInjector', 'Models', 'UnModellableFaults.json')
     with open(path, "w+") as JSONfile:
         json.dump(UnModellableFaults, JSONfile)
 
 if __name__ == "__main__":
     workers = int(args.workers)
+    UnModellableFaults = []
     FaultList = read_fault_list()
     manager = mp.Manager()
     Shared_Models_Queue = manager.Queue()
@@ -190,7 +188,7 @@ if __name__ == "__main__":
     GenerateModelsPool = mp.Pool(workers) 
     jobs = []   
     st = time.time()
-    for fault in range(len(FaultList)):
+    for fault in range(132):#len(FaultList)
         FID = FaultList[fault][3]
         scheduler = FaultList[fault][0]
         jobs.append(
@@ -198,6 +196,7 @@ if __name__ == "__main__":
                 GenerateModel,
                 (int(FID),
                  scheduler,
+                 UnModellableFaults,
                  Shared_Models_Queue)
             )
         )
@@ -217,7 +216,7 @@ if __name__ == "__main__":
     GenerateModelsPool.close()
     GenerateModelsPool.join()
 
-    storeUnModellableFaults()
+    storeUnModellableFaults(UnModellableFaults)
 
 
             
