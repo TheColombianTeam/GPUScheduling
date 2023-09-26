@@ -9,16 +9,10 @@ do
         echo "Schedulers dynamic behaviour for $config"
         python $dir/SchedulerDynamicBehaviour.py config=$dir/configs/$config.yaml
         echo "Copying results"
-        cp $dir/Schedulers/DynamicBehaviour/DistributedBlock.png  $dir/Schedulers/DynamicBehaviour/$config
-        cp $dir/Schedulers/DynamicBehaviour/DistributedCTA.png  $dir/Schedulers/DynamicBehaviour/$config
-        cp $dir/Schedulers/DynamicBehaviour/Greedy.png  $dir/Schedulers/DynamicBehaviour/$config
-        cp $dir/Schedulers/DynamicBehaviour/TwoLevelRoundRobin.png  $dir/Schedulers/DynamicBehaviour/$config
-        cp $dir/Schedulers/DynamicBehaviour/GlobalRoundRobin.png  $dir/Schedulers/DynamicBehaviour/$config
+        cp $dir/Schedulers/DynamicBehaviour/*.png  $dir/Schedulers/DynamicBehaviour/$config
+        cp $dir/Schedulers/DynamicBehaviour/*.csv  $dir/Schedulers/DynamicBehaviour/$config
     fi
 done
 
-rm $dir/Schedulers/DynamicBehaviour/DistributedBlock.png
-rm $dir/Schedulers/DynamicBehaviour/DistributedCTA.png
-rm $dir/Schedulers/DynamicBehaviour/Greedy.png
-rm $dir/Schedulers/DynamicBehaviour/TwoLevelRoundRobin.png
-rm $dir/Schedulers/DynamicBehaviour/GlobalRoundRobin.png
+rm $dir/Schedulers/DynamicBehaviour/*.png
+rm $dir/Schedulers/DynamicBehaviour/*.csv
