@@ -17,10 +17,11 @@ faulty_Cluster = int(args.faults.faulty_Cluster)
 faulty_SM = int(args.faults.faulty_SM)
 
 class Modellor(ErrorInjector,MaskInjector):
-    def __init__(self,Scheduler,imported = True, update = False):#imported falg is specifing if we are importing in a bigger env with respect to Schedulers
+    def __init__(self,Scheduler,imported = True, update = False, gpu = None):#imported falg is specifing if we are importing in a bigger env with respect to Schedulers
         self._update = update                                    #update flag is specifing if we are using the models or creating them from experiment data
         self._imported = imported
         self._Scheduler = Scheduler
+        self._gpu = gpu 
         self.MatrixMethod = ErrorInjector.__dict__['Float16_MatrixMul']#GEMM_v2
         self.method = ErrorInjector.__dict__['Float16Conversion']
         self.MaskInjection = MaskInjector.__dict__['ApplyMask']
@@ -123,10 +124,16 @@ class Modellor(ErrorInjector,MaskInjector):
         JSONfile.close()
 
     def ReadModels(self):
-        if self._imported :
-            models_path = os.path.join(os.getcwd(),'Schedulers', 'ErrorInjector','Models', str(self._Scheduler)+'.json')
+        if self._gpu == None : 
+            if self._imported :
+                models_path = os.path.join(os.getcwd(),'Schedulers', 'ErrorInjector','Models', str(self._Scheduler)+'.json')
+            else:
+                models_path = os.path.join(os.getcwd(),'ErrorInjector','Models', str(self._Scheduler)+'.json')
         else:
-            models_path = os.path.join(os.getcwd(),'ErrorInjector','Models', str(self._Scheduler)+'.json')
+            if self._imported :
+                models_path = os.path.join(os.getcwd(),'Schedulers', 'ErrorInjector',self._gpu, str(self._Scheduler)+'.json')
+            else:
+                models_path = os.path.join(os.getcwd(),'ErrorInjector',self._gpu, str(self._Scheduler)+'.json')
 
         with open(models_path,  encoding='utf-8') as json_file:
             Models =  json.load(json_file)
@@ -152,4 +159,8 @@ class Modellor(ErrorInjector,MaskInjector):
     def NumberFaultsAssociatedModelID(self,ModelID):
         return len(self._Models[ModelID]['FaultsAssociated'] ) #this function is used for fault coverage calculation
 
-   
+    def FaultsIDAssociatedModel(self,ModelID):
+        return self._Models[ModelID]['FaultsAssociated']
+
+    def AAEModel(self,ModelID):
+        return self._Models[ModelID]['AvgAbsError']
