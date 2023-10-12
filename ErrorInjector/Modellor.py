@@ -15,6 +15,8 @@ from Schedulers import *
 
 faulty_Cluster = int(args.faults.faulty_Cluster) 
 faulty_SM = int(args.faults.faulty_SM)
+MS = int(args.mxm.MS)
+NS = int(args.mxm.NS)
 
 class Modellor(ErrorInjector,MaskInjector):
     def __init__(self,Scheduler,imported = True, update = False, gpu = None):#imported falg is specifing if we are importing in a bigger env with respect to Schedulers
@@ -38,6 +40,7 @@ class Modellor(ErrorInjector,MaskInjector):
         golden_torch = self.MatrixMethod(self,a,b)
         Faulty_np = golden_torch.numpy().copy()
         self.AllocateCTA(a.numpy(),b.numpy(),Faulty_np)
+        
 
         mask_id = 0
         for CTA in self._CTAs : 
@@ -51,12 +54,13 @@ class Modellor(ErrorInjector,MaskInjector):
                 for coordinate in Masks[int(mask_id % len(Masks))] :  #Masks is a list of dictionary {str(x,y) : Mask}
                     _x , _y = eval(coordinate)
                     try :
-                        Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ] = self.MaskInjection.ApplyMask( self, 
+                        #bef = Float16(Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ])
+                        Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ] = self.MaskInjection( self, 
                                         Float16(Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ]), Masks[int(mask_id % len(Masks))][coordinate])
-
-                    except: #This is an excpetion raised since curropting an entrance introduced by zero padding that is removed later
-                        
-                        pass
+                        #print('injecting --> x:' + str(CTA['CTA']['x'] + _x) + ', y : ' + str(CTA['CTA']['y'] + _y )+ '    before : ' + str(bef)+ ' later :' + str(Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ] ))
+                        #print(' Bit Flipped : ' + str(hex(Float16(Faulty_np[CTA['CTA']['x'] + _x][CTA['CTA']['y'] + _y ]).bits ^ bef.bits )))
+                    except IndexError: #This is an excpetion raised since curropting an entrance introduced by zero padding that is removed late
+                        pass          
                 mask_id += 1
         return torch.from_numpy(Faulty_np)
 
@@ -126,12 +130,14 @@ class Modellor(ErrorInjector,MaskInjector):
     def ReadModels(self):
         if self._gpu == None : 
             if self._imported :
-                models_path = os.path.join(os.getcwd(),'Schedulers', 'ErrorInjector','Models', str(self._Scheduler)+'.json')
+                models_path = os.path.join(os.getcwd(),'CustomDNNLayer',
+                                           'Schedulers', 'ErrorInjector','Models', str(self._Scheduler)+'.json')
             else:
                 models_path = os.path.join(os.getcwd(),'ErrorInjector','Models', str(self._Scheduler)+'.json')
         else:
             if self._imported :
-                models_path = os.path.join(os.getcwd(),'Schedulers', 'ErrorInjector',self._gpu, str(self._Scheduler)+'.json')
+                models_path = os.path.join(os.getcwd(),'CustomDNNLayer',
+                                           'Schedulers', 'ErrorInjector',self._gpu, str(self._Scheduler)+'.json')
             else:
                 models_path = os.path.join(os.getcwd(),'ErrorInjector',self._gpu, str(self._Scheduler)+'.json')
 
@@ -148,9 +154,9 @@ class Modellor(ErrorInjector,MaskInjector):
         return Models
     
     def AllocateCTA(self, a, b, c):
-        a = complete(a)
-        b = complete(b)
-        c = complete(c)
+        a = complete(a,MS,NS)
+        b = complete(b,MS,NS)
+        c = complete(c, MS,NS)
         self._CTAs = self.__scheduler.scheduler_algorithm(a, b, c)
 
     def ModelIDs(self):
