@@ -96,6 +96,7 @@ def PloatAAE(AAEModels, factor,gpu):
         x.append(f)
 
     #calculating cross correlation
+    """
     corss_correlation = []
     for k in range(len(x)):
         corss_correlation.append(0.0)
@@ -123,15 +124,16 @@ def PloatAAE(AAEModels, factor,gpu):
                                                                                     (len(x) * sumModelsErrSquared - sumModelsErr*sumModelsErr) )
 
     print('Correlation coeff '+ str(factor) + ' : ' + str(CorrelationCoeff))
+    """
 
 
     plt.yscale('log')
-    plt.plot(x,ModelsErr, color='red', label='Models AAE')
-    plt.plot(x,FaultErr, color='black', label='Max AAE Faults associated to model')
-    plt.plot(x,corss_correlation,color= 'blue', label= 'Cross Correlation')
+    plt.plot(x,ModelsErr, color='red', label='Error model')
+    plt.plot(x,FaultErr, color='gray', label='FI campaigns', alpha=0.7)
     plt.legend()
-    plt.xlabel('Models sorted in increasing AAE')
-    plt.savefig("./ErrorInjector/"+ str(gpu)+'/'+str(factor)+".png")
+    plt.xlabel('Error list "Error model"')
+    plt.ylabel('MAE')
+    plt.savefig("./ErrorInjector/"+ str(gpu)+'/'+str(factor)+".png", bbox_inches='tight')
     plt.show()
     plt.close()
 
