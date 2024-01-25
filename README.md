@@ -1,8 +1,8 @@
 # Schedulers
 
-This framework is a functional simulator of different scheduler policies for Matrix Multiplication. The scheduler policies implemented the tiling approach presented in [Tiling algorithm GEMM](http://arxiv.org/abs/1808.07984) and [NVIDIA Tiling](https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html), and it describes the functional implementation of different scheduling policies presented by [Scheduling for NoC arhcitectures](https://ieeexplore.ieee.org/abstract/document/8625517)
+This framework is a functional simulator of different scheduler policies for Matrix Multiplication. The scheduler policies implements the tiling approach presented in [Tiling algorithm GEMM](http://arxiv.org/abs/1808.07984) and [NVIDIA Tiling](https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html), and describes the functional implementation of several scheduling policies presented by [Scheduling for NoC arhcitectures](https://ieeexplore.ieee.org/abstract/document/8625517)
 
-## Intallation
+## Install
 
 Please clone this repo using the following command:
 
@@ -10,7 +10,7 @@ Please clone this repo using the following command:
 git clone --recurse-submodules https://github.com/TheColombianTeam/Schedulers.git
 ```
 
-This framework is built on top of [PyOpenTCU](https://github.com/TheColombianTeam/PyOpenTCU.git). The requirements are available inside [requeriments.txt](./requeriments.txt).
+This framework is built on top of [PyOpenTCU](https://github.com/TheColombianTeam/PyOpenTCU.git), and the requirements are available inside [requeriments.txt](./requeriments.txt).
 
 Please install using following command:
 
@@ -18,19 +18,19 @@ Please install using following command:
 pip install -r requeriments.txt
 ```
 
-Those commands should create the conda environment with whole packages required to excuse this framework. However, if exist any problem with the SFPY library, please read the documentation available on [sfpy](https://github.com/billzorn/sfpy.git).
+Those commands should install the dependencies required to excuse this framework. However, if exist any problem with the *SFPY* library, please read the documentation available on [sfpy](https://github.com/billzorn/sfpy.git).
 
 ## Usage
 
 Once the packages are installed, run the following command:
 
 ```bash
-sh run.sh
+sh fi_campaign.sh
 ```
 
-This bash script runs the validation process. This process executes the default *Mock* scheduler and compares the result with the golden result.
+This bash script runs the Fault Injection campaings. This process executes all the configurations under the *Mock* scheduler and compares the result with the golden result.
 
-To validate another scheduler, please modify the `SCHEDULER_POLICY` variable inside the `run.sh` file. The possible options available are:
+To validate another scheduler, please use the `scheduler` argument when execute when you run the code. The possible options available are:
 
 ```bash
 SCHEDULER_POLICY=DistributedBlock
@@ -40,19 +40,7 @@ SCHEDULER_POLICY=Greedy
 SCHEDULER_POLICY=TwoLevelRoundRobin
 ```
 
-### **NOTE: These policies are under development**
-
-### Development process
-
-Inside the [Schedulers](/Schedulers/) module, you can find the different policies to be implemented. The [Mock](/Schedulers/mock.py) class contains the basic idea of: 
-- Basic Tiling (generates CTAs Id and (X, Y) coordinates, other parameters are dummy)
-- return a list of dictionaries with the scheduled tiles (No scheduler implemented) 
-
-Inside the *Mock* class, you will find the method [scheduler_algorithm](/Schedulers/mock.py?plain=1#L19). This method is the one that should implement the tiling procedure and the scheduling implementation, and it should return the list of dictionaries as the requirement for the fault injector. This method is also the interface between the scheduler and the rest of the framework, so you should use a similar implementation of such a function for every scheduler you need to implement. This method receives as parameters the matrices `A`, `B`, and `C` and should return an array with the CTAs structure shown in [Scheduler](/Schedulers/models/Scheduler.py?plain=1#L20). All the policies implemented must return this structure since it is used by the Fault Injector (now under development).
-
-To validate the scheduler policy implemented, please modify the `SCHEDULER_POLICY` variable on `run.sh` according to the information above. After the execution, you can find in the ./logs directory a log file that will show if the verification passed or, on the contrary, it failed. 
-
-NOTE: the verification only checks that the matrix multiplication can be done by using the array structure your scheduler implementation provided; however, the correct scheduling assignment must be checked on your own. 
+Moreover, in the [configs](./configs/) folder you can find several GPU configurations.
 
 ### Change Matrix Size
 If you want to evaluate different matrix sizes, you can modify the arguments of the matrix generation in the [golden.py](https://github.com/TheColombianTeam/Schedulers/blob/c50d9a0069a373c0de62c5f91d4092b75af9afcb/golden.py#L43C12-L43C12). For example, the following snippet code for the main function creates the golden matrices a,b,c,d of size 128X128, you can use any size you want being careful that the sizes are correct for performing matrix multiplication.
@@ -76,10 +64,3 @@ You can generate the new matrices once you modify the golden file by executing t
 python golden.py
 ```
 After the golden is generated successfully, then you can run the bash script to check if the array of CTAs generated in your scheduler policy is still working correctly. 
-
-### Formatting code
-
-Only for maintaining a common structure, I recommend using one format extension (i.e., [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter)) for vs. Please use it.
-
-### **MODIFICATIONS MY LAST PUSH
-
