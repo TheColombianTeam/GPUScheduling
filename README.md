@@ -5,12 +5,12 @@ This framework provides a functional structural model of modern GPUs, with a pri
 Key features include:
 
 - Support for multiple state-of-the-art scheduling policies, inspired by real-world hardware implementations in modern GPUs [[1]](https://ieeexplore.ieee.org/abstract/document/8625517), including:
- - Distributed Block
- - Distributed CTA
- - Global Round Robin
- - Greedy
- - Two-Level Round Robin
- - 
+    - Distributed Block
+    - Distributed CTA
+    - Global Round Robin
+    - Greedy
+    - Two-Level Round Robin
+ 
 - Configurable architectural components to explore design trade-offs and performance implications.
 
 This framework is ideal for researchers and developers interested in studying GPU microarchitecture, especially in the context of AI and HPC workloads.
