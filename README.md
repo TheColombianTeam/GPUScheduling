@@ -1,4 +1,4 @@
-# PyOpenGPU_Scheduling Framework
+# PyOpenGPU_Scheduling Framework 🏿
 
 This framework provides a functional structural model of modern GPUs, with a primary focus on executing workloads on Tensor Cores, such as matrix multiplication operations. It enables users to simulate and analyze the GPU execution behavior with a particular emphasis on scheduling policies for Tensor Core workloads.
 
