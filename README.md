@@ -1,8 +1,23 @@
+# PyOpenGPU_Scheduling Framework
+
+This framework provides a functional structural model of modern GPUs, with a primary focus on executing workloads on Tensor Cores, such as matrix multiplication operations. It enables users to simulate and analyze the GPU execution behavior with a particular emphasis on scheduling policies for Tensor Core workloads.
+
+Key features include:
+
+Support for multiple state-of-the-art scheduling policies, inspired by real-world hardware implementations in modern GPUs [1](https://ieeexplore.ieee.org/abstract/document/8625517).
+
+Configurable architectural components to explore design trade-offs and performance implications.
+
+This framework is ideal for researchers and developers interested in studying GPU microarchitecture, especially in the context of AI and HPC workloads.
+
+
 # Schedulers
 
-This framework is a functional structural simulator of GPUs for the execution of Matrix Multiplication workloads, using Tensor Cores. In addition, the framework includes support for several scheduling policies, commonly implemented in hardware in GPUs.
+The workload scheduling implement the tiling approach presented in [Tiling algorithm GEMM](http://arxiv.org/abs/1808.07984) and [NVIDIA Tiling](https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html), 
 
-The scheduler policies implements the tiling approach presented in [Tiling algorithm GEMM](http://arxiv.org/abs/1808.07984) and [NVIDIA Tiling](https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html), and describes the functional implementation of several scheduling policies presented by [Scheduling for NoC arhcitectures](https://ieeexplore.ieee.org/abstract/document/8625517)
+# Functional Cores (Tensor Cores)
+
+This framework uses the Tensor Core descriptions and models by [PyOpenTCU](https://github.com/TheColombianTeam/PyOpenTCU.git).
 
 ## Install
 
