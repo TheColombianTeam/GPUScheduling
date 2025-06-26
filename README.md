@@ -4,7 +4,7 @@ This framework provides a functional structural model of modern GPUs, with a pri
 
 Key features include:
 
-Support for multiple state-of-the-art scheduling policies, inspired by real-world hardware implementations in modern GPUs [1](https://ieeexplore.ieee.org/abstract/document/8625517).
+Support for multiple state-of-the-art scheduling policies, inspired by real-world hardware implementations in modern GPUs [[1]](https://ieeexplore.ieee.org/abstract/document/8625517).
 
 Configurable architectural components to explore design trade-offs and performance implications.
 
